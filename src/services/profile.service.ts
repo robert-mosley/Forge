@@ -33,7 +33,7 @@ export async function getProfileBundle(
     supabase
       .from("profiles")
       .select(
-        "id, username, full_name, major, campus, bio, github_username, created_at",
+        "id, username, full_name, major, campus, bio, github_username, github_url, profile_picture_url, academic_year, interests, is_discoverable, show_availability, created_at",
       )
       .eq("id", userId)
       .maybeSingle(),
@@ -45,8 +45,7 @@ export async function getProfileBundle(
     supabase
       .from("student_skills")
       .select("user_id, skill_id, proficiency, source")
-      .eq("user_id", userId)
-      .eq("source", "manual"),
+      .eq("user_id", userId),
   ]);
 
   const failedResult = [profileResult, skillResult, selectedResult].find(
@@ -94,6 +93,12 @@ export async function saveOwnProfile(
       campus: input.campus,
       bio: input.bio,
       github_username: input.github_username,
+      github_url: input.github_url ?? null,
+      profile_picture_url: input.profile_picture_url ?? null,
+      academic_year: input.academic_year ?? null,
+      interests: input.interests,
+      is_discoverable: input.is_discoverable,
+      show_availability: input.show_availability,
     },
     { onConflict: "id" },
   );

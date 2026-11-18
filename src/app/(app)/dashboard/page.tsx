@@ -58,6 +58,23 @@ export default async function DashboardPage({
   const params = await searchParams;
   const firstName = bundle.profile?.full_name?.split(" ")[0] ?? "there";
 
+  const [{ data: ownProjects }, { data: recentProjects }, { data: recommendedStudents }] = await Promise.all([
+    supabase.from("projects").select("id").eq("user_id", user.id).eq("is_public", true),
+    supabase
+      .from("projects")
+      .select("id, title, repo_name, description, discipline, project_type")
+      .eq("is_public", true)
+      .neq("user_id", user.id)
+      .order("created_at", { ascending: false })
+      .limit(3),
+    supabase
+      .from("profiles")
+      .select("id, username, full_name, major, campus, profile_picture_url, interests")
+      .eq("is_discoverable", true)
+      .neq("id", user.id)
+      .limit(3),
+  ]);
+
   return (
     <div className="workspace-page">
       {params.notice === "signout-failed" && (
@@ -65,29 +82,67 @@ export default async function DashboardPage({
           Sign out did not finish. Your session is still active; try again.
         </p>
       )}
-      <p className="workspace-eyebrow">Workspace / Overview</p>
+      <p className="workspace-eyebrow">Home / Today</p>
       <h1>Welcome, {firstName}.</h1>
       <p className="workspace-lede">
-        Your profile is ready. Forge is being built to help KSU students turn
-        complementary skills into better project teams.
+        Turn the work you are doing into a portfolio and find students with complementary strengths.
       </p>
-      <section aria-labelledby="next-step-title" className="workspace-next">
-        <div>
-          <p className="workspace-eyebrow">Your next step</p>
-          <h2 id="next-step-title">Make sure your profile says what you want it to.</h2>
-          <p>
-            Keep your interests and self-reported skills current. Repository
-            evidence and collaborator discovery are not available yet.
-          </p>
-        </div>
-        <Link className="workspace-button" href="/profile">
-          Review my profile
+
+      <section className="dashboard-actions">
+        <Link href={ownProjects?.length ? "/projects/new" : "/projects/new?from=setup"}>
+          <span>01 / Portfolio</span>
+          <strong>{ownProjects?.length ? "Add another project" : "Add your first project"}</strong>
+        </Link>
+        <Link href="/discover">
+          <span>02 / Collaborators</span>
+          <strong>Discover students</strong>
+        </Link>
+        <Link href="/profile?edit=1">
+          <span>03 / Profile</span>
+          <strong>Update your strengths</strong>
         </Link>
       </section>
-      <p className="workspace-footnote">
-        You can update your profile at any time. Your availability and course
-        details are not shown here.
-      </p>
+
+      <section className="dashboard-section">
+        <div className="dashboard-section-heading">
+          <div><p className="workspace-eyebrow">Across KSU</p><h2>Recent projects</h2></div>
+          <Link href="/projects">Explore all</Link>
+        </div>
+        {recentProjects?.length ? (
+          <div className="project-grid">
+            {recentProjects.map((project) => (
+              <Link className="project-card" href={`/projects/${project.id}`} key={project.id}>
+                <p className="project-card-meta">{project.discipline || "Engineering"} · {project.project_type || "Project"}</p>
+                <h2>{project.title || project.repo_name}</h2>
+                <p>{project.description || "Explore this engineering project."}</p>
+              </Link>
+            ))}
+          </div>
+        ) : <p className="empty-inline">No public projects have been shared yet.</p>}
+      </section>
+
+      <section className="dashboard-section">
+        <div className="dashboard-section-heading">
+          <div><p className="workspace-eyebrow">People to meet</p><h2>Suggested students</h2></div>
+          <Link href="/discover">Open discovery</Link>
+        </div>
+        {recommendedStudents?.length ? (
+          <div className="student-grid">
+            {recommendedStudents.map((student) => (
+              <Link className="student-card" href={`/students/${student.username}`} key={student.id}>
+                {student.profile_picture_url ? (
+                  // eslint-disable-next-next-line @next/next/no-img-element
+                  <img className="student-card-image" src={student.profile_picture_url} alt="" />
+                ) : (
+                  <span className="student-avatar" aria-hidden="true">{(student.full_name || student.username || "S").slice(0, 1).toUpperCase()}</span>
+                )}
+                <h2>{student.full_name || student.username}</h2>
+                <p>{student.major || "Engineering student"}</p>
+              </Link>
+            ))}
+          </div>
+        ) : <p className="empty-inline">New student profiles will appear here as they join.</p>}
+      </section>
     </div>
   );
 }

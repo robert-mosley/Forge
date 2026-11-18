@@ -13,6 +13,16 @@ const githubUsername = z.preprocess(
     .nullable(),
 );
 
+const optionalUrl = z.preprocess(
+  (value) => (value === "" ? null : value),
+  z.string().trim().url("Enter a valid GitHub URL.").nullable().optional(),
+);
+
+const optionalTextArray = z.preprocess(
+  (value) => Array.isArray(value) ? value : [],
+  z.array(z.string().trim().min(1)).max(12),
+);
+
 export const profileSchema = z.object({
   full_name: z
     .string()
@@ -40,7 +50,13 @@ export const profileSchema = z.object({
     .min(2, "Enter your KSU campus.")
     .max(80, "Keep your campus name under 80 characters."),
   bio: z.string().trim().max(280, "Bio must be 280 characters or fewer."),
+  academic_year: z.string().trim().max(40).optional().nullable(),
+  interests: optionalTextArray,
+  profile_picture_url: z.string().trim().url().nullable().optional(),
   github_username: githubUsername,
+  github_url: optionalUrl,
+  is_discoverable: z.boolean().optional().default(true),
+  show_availability: z.boolean().optional().default(false),
   skills: z
     .array(
       z.object({
@@ -48,12 +64,13 @@ export const profileSchema = z.object({
         proficiency: z.enum(["beginner", "intermediate", "advanced", "expert"]),
       }),
     )
-    .min(1, "Select at least one skill.")
+    .min(0)
     .max(12, "Select no more than 12 skills.")
     .refine(
       (skills) => new Set(skills.map((skill) => skill.skill_id)).size === skills.length,
       "A skill can only be selected once.",
-    ),
+    )
+    .default([]),
 });
 
 export type ProfileInput = z.infer<typeof profileSchema>;
@@ -71,7 +88,6 @@ export function isProfileComplete(
     profile?.full_name?.trim() &&
       profile.username?.trim() &&
       profile.major?.trim() &&
-      profile.campus?.trim() &&
-      skillCount > 0,
+      profile.campus?.trim(),
   );
 }

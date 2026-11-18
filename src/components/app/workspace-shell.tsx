@@ -21,8 +21,11 @@ export function WorkspaceShell({
           Forge
         </Link>
         <nav aria-label="Workspace navigation" className="workspace-nav">
-          <Link href="/dashboard">Overview</Link>
+          <Link href="/dashboard">Home</Link>
+          <Link href="/discover">Discover</Link>
+          <Link href="/projects">Projects</Link>
           <Link href="/profile">My profile</Link>
+          <Link href="/settings">Settings</Link>
         </nav>
         <div className="workspace-account">
           <span className="workspace-email">{email}</span>

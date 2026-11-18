@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { WorkspaceMessage } from "@/components/app/workspace-message";
-import { ProfileForm } from "@/components/profile/profile-form";
+import { EngineeringProfileForm } from "@/components/profile/engineering-profile-form";
 import { requireUser } from "@/lib/auth/require-user";
+import { isSupabaseConfigured } from "@/lib/env";
 import { isProfileComplete } from "@/schemas/profile.schema";
 import {
   getProfileBundle,
@@ -10,23 +11,45 @@ import {
 
 export const metadata = { title: "Set up your profile" };
 
-export default async function ProfileSetupPage() {
+export default async function ProfileSetupPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ imported?: string }>;
+}) {
+  if (!isSupabaseConfigured()) {
+    return (
+      <WorkspaceMessage
+        title="Profile setup is not ready."
+        message="Supabase is not configured. Add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY to .env.local or Replit Secrets, then restart the server."
+        actionHref="/login"
+        actionLabel="Open account setup"
+      />
+    );
+  }
+
   const { supabase, user } = await requireUser();
 
   try {
     const bundle = await getProfileBundle(supabase, user.id);
+    const params = await searchParams;
 
     if (isProfileComplete(bundle.profile, bundle.selectedSkills.length)) {
       return (
         <div className="workspace-page">
-          <p className="workspace-eyebrow">Profile / Ready</p>
-          <h1>Your profile is set.</h1>
+          <p className="workspace-eyebrow">Profile / 02 / Portfolio</p>
+          <h1>Add a project you are proud of.</h1>
           <p className="workspace-lede">
-            You can review or update your information whenever you need to.
+            Your profile is ready. Projects give teammates concrete evidence of
+            how you think and build, but this step is optional.
           </p>
-          <Link className="workspace-button" href="/profile">
-            Review my profile
-          </Link>
+          <div className="onboarding-actions">
+            <Link className="workspace-button" href="/projects/new?from=setup">
+              Add my first project
+            </Link>
+            <Link className="portfolio-edit-link" href="/dashboard">
+              Skip for now
+            </Link>
+          </div>
         </div>
       );
     }
@@ -34,6 +57,12 @@ export default async function ProfileSetupPage() {
     return (
       <div className="workspace-page workspace-form-page">
         <div className="workspace-form-intro">
+          {params.imported === "1" && (
+            <p className="workspace-success" role="status">
+              Your GitHub portfolio draft is ready. Review the details below and
+              finish setup.
+            </p>
+          )}
           <p className="workspace-eyebrow">First, your profile / 01</p>
           <h1>What do you bring to the work?</h1>
           <p className="workspace-lede">
@@ -41,7 +70,7 @@ export default async function ProfileSetupPage() {
             are self-reported until you connect project evidence.
           </p>
         </div>
-        <ProfileForm
+        <EngineeringProfileForm
           initialProfile={bundle.profile}
           skills={bundle.skills}
           selectedSkills={bundle.selectedSkills}

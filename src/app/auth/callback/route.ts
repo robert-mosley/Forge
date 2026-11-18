@@ -9,7 +9,7 @@ const allowedDestinations = new Set([
 ]);
 
 function getSafeDestination(value: string | null): string {
-  return value && allowedDestinations.has(value) ? value : "/dashboard";
+  return value && allowedDestinations.has(value) ? value : "/profile/setup";
 }
 
 export async function GET(request: NextRequest) {

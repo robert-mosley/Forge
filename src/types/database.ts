@@ -16,6 +16,12 @@ export type ProfileRow = {
   campus: string | null;
   bio: string | null;
   github_username: string | null;
+  github_url: string | null;
+  profile_picture_url: string | null;
+  academic_year: string | null;
+  interests: string[];
+  is_discoverable: boolean;
+  show_availability: boolean;
   created_at: string;
 };
 
@@ -46,10 +52,17 @@ export type Database = {
           user_id: string;
           github_url: string | null;
           repo_name: string;
+          title: string;
+          discipline: string | null;
+          project_type: string | null;
+          student_role: string | null;
+          contributions: string | null;
+          outcomes: string | null;
           description: string | null;
           technical_overview: string | null;
           tech_stack: string[];
           processing_status: "pending" | "processing" | "ready" | "failed";
+          is_public: boolean;
           created_at: string;
         },
         {
@@ -57,10 +70,41 @@ export type Database = {
           user_id: string;
           github_url?: string | null;
           repo_name: string;
+          title?: string;
+          discipline?: string | null;
+          project_type?: string | null;
+          student_role?: string | null;
+          contributions?: string | null;
+          outcomes?: string | null;
           description?: string | null;
           technical_overview?: string | null;
           tech_stack?: string[];
           processing_status?: "pending" | "processing" | "ready" | "failed";
+          is_public?: boolean;
+          created_at?: string;
+        }
+      >;
+      project_evidence: Table<
+        {
+          id: string;
+          project_id: string;
+          title: string | null;
+          file_name: string;
+          file_type: string | null;
+          file_url: string;
+          storage_path: string | null;
+          kind: string;
+          created_at: string;
+        },
+        {
+          id?: string;
+          project_id: string;
+          title?: string | null;
+          file_name: string;
+          file_type?: string | null;
+          file_url: string;
+          storage_path?: string | null;
+          kind?: string;
           created_at?: string;
         }
       >;
