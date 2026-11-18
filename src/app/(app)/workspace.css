@@ -1,0 +1,459 @@
+.workspace-shell {
+  display: flex;
+  min-height: 100svh;
+  flex-direction: column;
+  background: var(--forge-paper);
+}
+
+.workspace-skip {
+  position: fixed;
+  z-index: 20;
+  top: 0.75rem;
+  left: 0.75rem;
+  transform: translateY(-160%);
+  background: var(--forge-ink);
+  color: var(--forge-paper);
+  padding: 0.8rem 1rem;
+}
+
+.workspace-skip:focus {
+  transform: translateY(0);
+}
+
+.workspace-header {
+  display: flex;
+  min-height: 76px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  border-bottom: 1px solid var(--forge-line);
+  padding: 0.8rem clamp(1.2rem, 5vw, 4.5rem);
+}
+
+.workspace-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  color: var(--forge-ink);
+  font-family: var(--forge-display);
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: -0.06em;
+  text-decoration: none;
+}
+
+.workspace-brand-mark {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  background: var(--forge-ink);
+  color: var(--forge-accent);
+  font-family: var(--forge-mono);
+  font-size: 0.82rem;
+  font-weight: 500;
+}
+
+.workspace-nav,
+.workspace-account {
+  display: flex;
+  align-items: center;
+  gap: clamp(1rem, 2.5vw, 2rem);
+}
+
+.workspace-nav a,
+.workspace-signout {
+  color: var(--forge-ink);
+  font-family: var(--forge-mono);
+  font-size: 0.67rem;
+  letter-spacing: 0.06em;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.workspace-nav a:hover,
+.workspace-signout:hover {
+  color: #61752b;
+}
+
+.workspace-email {
+  max-width: 240px;
+  overflow: hidden;
+  color: var(--forge-muted);
+  font-size: 0.78rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workspace-account form {
+  margin: 0;
+}
+
+.workspace-signout {
+  border: 1px solid var(--forge-line);
+  background: transparent;
+  cursor: pointer;
+  padding: 0.65rem 0.8rem;
+}
+
+.workspace-main {
+  width: min(100% - 2.5rem, 1120px);
+  flex: 1;
+  margin: 0 auto;
+  padding: clamp(3.5rem, 8vw, 6.5rem) 0;
+}
+
+.workspace-page {
+  width: 100%;
+}
+
+.workspace-eyebrow {
+  margin: 0 0 1rem;
+  color: #70852d;
+  font-family: var(--forge-mono);
+  font-size: 0.67rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.workspace-page h1,
+.workspace-message h1 {
+  max-width: 850px;
+  margin: 0;
+  font-family: var(--forge-display);
+  font-size: clamp(2.8rem, 6.8vw, 6.2rem);
+  font-weight: 500;
+  letter-spacing: -0.075em;
+  line-height: 0.98;
+}
+
+.workspace-lede {
+  max-width: 660px;
+  margin: 1.4rem 0 0;
+  color: #5e6961;
+  font-size: 1rem;
+  line-height: 1.8;
+}
+
+.workspace-next {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+  margin-top: 4rem;
+  border-top: 1px solid var(--forge-line);
+  border-bottom: 1px solid var(--forge-line);
+  padding: 2rem 0;
+}
+
+.workspace-next > div {
+  max-width: 660px;
+}
+
+.workspace-next h2 {
+  margin: 0;
+  font-family: var(--forge-display);
+  font-size: clamp(1.7rem, 3vw, 2.6rem);
+  font-weight: 500;
+  letter-spacing: -0.055em;
+}
+
+.workspace-next p:not(.workspace-eyebrow) {
+  margin: 0.8rem 0 0;
+  color: var(--forge-muted);
+  font-size: 0.9rem;
+  line-height: 1.7;
+}
+
+.workspace-footnote {
+  max-width: 650px;
+  margin: 1.25rem 0 0;
+  color: var(--forge-muted);
+  font-family: var(--forge-mono);
+  font-size: 0.67rem;
+  line-height: 1.7;
+}
+
+.workspace-button {
+  display: inline-flex;
+  min-height: 46px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  background: var(--forge-ink);
+  color: var(--forge-paper);
+  padding: 0.8rem 1.1rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: transform 160ms ease, background 160ms ease;
+}
+
+.workspace-button:hover {
+  transform: translateY(-1px);
+  background: #354638;
+}
+
+.workspace-message {
+  max-width: 760px;
+  border-top: 1px solid var(--forge-line);
+  padding-top: 2rem;
+}
+
+.workspace-message > p:not(.workspace-eyebrow) {
+  max-width: 580px;
+  margin: 1.2rem 0 1.8rem;
+  color: var(--forge-muted);
+  line-height: 1.75;
+}
+
+.workspace-alert,
+.workspace-success,
+.form-error,
+.form-success {
+  border-left: 2px solid #9a5a3a;
+  background: rgba(255, 255, 255, 0.45);
+  color: #673a29;
+  padding: 0.85rem 1rem;
+  font-size: 0.86rem;
+  line-height: 1.6;
+}
+
+.workspace-success,
+.form-success {
+  border-color: #61752b;
+  color: #3e5120;
+}
+
+.workspace-form-page > h1 {
+  max-width: 800px;
+}
+
+.workspace-form-intro {
+  margin-bottom: 2.5rem;
+}
+
+.profile-form {
+  border-top: 1px solid var(--forge-line);
+  padding-top: 2rem;
+}
+
+.profile-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.4rem 1.6rem;
+}
+
+.form-field {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 0.5rem;
+  color: var(--forge-ink);
+  font-size: 0.83rem;
+  font-weight: 600;
+}
+
+.form-field > span em {
+  margin-left: 0.4rem;
+  color: var(--forge-muted);
+  font-size: 0.7rem;
+  font-style: normal;
+  font-weight: 400;
+}
+
+.form-field input,
+.form-field textarea,
+.skill-proficiency select {
+  width: 100%;
+  border: 1px solid #bfc7b9;
+  border-radius: 0;
+  background: rgba(255, 255, 255, 0.5);
+  color: var(--forge-ink);
+  font: inherit;
+  font-weight: 400;
+  padding: 0.85rem 0.9rem;
+}
+
+.form-field textarea {
+  resize: vertical;
+}
+
+.form-field input::placeholder,
+.form-field textarea::placeholder {
+  color: #7b857d;
+}
+
+.form-field small {
+  color: var(--forge-muted);
+  font-size: 0.73rem;
+  font-weight: 400;
+  line-height: 1.5;
+}
+
+.form-field-wide {
+  grid-column: 1 / -1;
+}
+
+.skills-fieldset {
+  min-width: 0;
+  margin: 2.4rem 0 0;
+  border: 0;
+  border-top: 1px solid var(--forge-line);
+  padding: 1.5rem 0 0;
+}
+
+.skills-fieldset legend {
+  float: left;
+  width: 100%;
+  margin: 0 0 0.4rem;
+  padding: 0;
+  color: var(--forge-ink);
+  font-family: var(--forge-display);
+  font-size: 1.5rem;
+  font-weight: 500;
+  letter-spacing: -0.035em;
+}
+
+.skills-fieldset > p {
+  clear: both;
+  margin: 0 0 1.2rem;
+  color: var(--forge-muted);
+  font-size: 0.84rem;
+  line-height: 1.6;
+}
+
+.skill-list {
+  border-top: 1px solid var(--forge-line);
+}
+
+.skill-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(150px, 220px);
+  align-items: center;
+  gap: 1rem;
+  border-bottom: 1px solid var(--forge-line);
+  padding: 0.6rem 0;
+}
+
+.skill-choice {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  color: var(--forge-ink);
+  cursor: pointer;
+  font-size: 0.86rem;
+}
+
+.skill-choice input {
+  width: 1rem;
+  height: 1rem;
+  accent-color: #64782e;
+}
+
+.skill-proficiency select {
+  min-height: 38px;
+  padding: 0.45rem 0.6rem;
+  font-size: 0.76rem;
+}
+
+.profile-form-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  margin-top: 1.8rem;
+}
+
+.profile-form-footer p {
+  max-width: 480px;
+  margin: 0;
+  color: var(--forge-muted);
+  font-family: var(--forge-mono);
+  font-size: 0.65rem;
+  line-height: 1.7;
+}
+
+.profile-form button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.workspace-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  border-top: 1px solid var(--forge-line);
+  padding: 1.3rem clamp(1.2rem, 5vw, 4.5rem);
+  color: var(--forge-muted);
+  font-family: var(--forge-mono);
+  font-size: 0.61rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+@media (max-width: 760px) {
+  .workspace-header {
+    flex-wrap: wrap;
+    gap: 0.85rem;
+  }
+
+  .workspace-brand {
+    margin-right: auto;
+  }
+
+  .workspace-nav {
+    order: 3;
+    width: 100%;
+    border-top: 1px solid var(--forge-line);
+    padding-top: 0.8rem;
+  }
+
+  .workspace-account {
+    gap: 0.6rem;
+  }
+
+  .workspace-email {
+    display: none;
+  }
+
+  .workspace-main {
+    width: min(100% - 2rem, 1120px);
+    padding: 3.2rem 0;
+  }
+
+  .workspace-next,
+  .profile-form-footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 560px) {
+  .profile-form-grid {
+    grid-template-columns: 1fr;
+    gap: 1.1rem;
+  }
+
+  .form-field-wide {
+    grid-column: auto;
+  }
+
+  .skill-row {
+    grid-template-columns: minmax(0, 1fr) minmax(125px, 42%);
+    gap: 0.5rem;
+  }
+
+  .skill-choice {
+    font-size: 0.78rem;
+  }
+
+  .skill-proficiency select {
+    font-size: 0.7rem;
+  }
+
+  .workspace-footer {
+    flex-direction: column;
+    font-size: 0.55rem;
+  }
+}

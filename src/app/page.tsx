@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function HomePage() {
   return (
     <div className="site-shell" id="top">
@@ -23,9 +25,10 @@ export default function HomePage() {
         <nav aria-label="Main navigation" className="nav-links">
           <a href="#principles">Why Forge</a>
           <a href="#approach">Approach</a>
-          <a className="nav-cta" href="#direction">
-            The direction <span aria-hidden="true">↘</span>
-          </a>
+          <Link href="/login">Sign in</Link>
+          <Link className="nav-cta" href="/signup">
+            Create account <span aria-hidden="true">↘</span>
+          </Link>
         </nav>
       </header>
 
@@ -41,17 +44,16 @@ export default function HomePage() {
               <span>right mix.</span>
             </h1>
             <p className="hero-description">
-              Forge is a collaboration platform in the making for KSU computing
-              students who want to find project teammates with skills that
-              complement their own.
+              Forge helps KSU computing students find project teammates with
+              skills that complement their own.
             </p>
             <div className="hero-actions">
-              <a className="button-primary" href="#approach">
-                How we see it working <span aria-hidden="true">↘</span>
-              </a>
-              <a className="text-link" href="#principles">
-                Why build Forge <span aria-hidden="true">→</span>
-              </a>
+              <Link className="button-primary" href="/signup">
+                Create your profile <span aria-hidden="true">↘</span>
+              </Link>
+              <Link className="text-link" href="/login">
+                Already a member? Sign in <span aria-hidden="true">→</span>
+              </Link>
             </div>
           </div>
 

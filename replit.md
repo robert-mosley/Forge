@@ -24,3 +24,28 @@ Create a Supabase project, then add these Replit Secrets:
 
 The database migration can be applied with the Supabase CLI or SQL editor.
 Never add a service-role key to client code or commit credentials.
+
+Apply every SQL file in `supabase/migrations` in filename order. In the
+Supabase Auth URL settings, allow the Replit preview origin plus
+`/auth/callback` as a redirect URL. Add the local development callback URL too
+if you use the app outside Replit.
+
+## Account routes
+
+- `/login` — sign in to an existing account.
+- `/signup` — create an account and confirm its email if Supabase requires it.
+- `/forgot-password` and `/reset-password` — request and complete account recovery.
+- `/profile/setup` — complete the required profile and select self-reported skills.
+- `/profile` — update the signed-in student's profile.
+- `/dashboard` — protected workspace landing page.
+
+The auth callback exchanges confirmation and recovery codes for a server-side
+session. When Supabase Secrets are missing, the public auth pages explain what
+must be configured and do not pretend a login or save succeeded.
+
+## Checks
+
+- `npm run lint`
+- `npm run typecheck`
+- `npm run test`
+- `npm run build`

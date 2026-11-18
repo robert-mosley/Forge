@@ -49,7 +49,7 @@ create table public.student_skills (
     check (proficiency in ('beginner', 'intermediate', 'advanced', 'expert')),
   source text not null
     check (source in ('manual', 'project', 'course')),
-  primary key (user_id, skill_id)
+  primary key (user_id, skill_id, source)
 );
 
 create table public.availability (

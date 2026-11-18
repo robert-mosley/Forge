@@ -1,0 +1,28 @@
+insert into public.skills (canonical_name, category)
+values
+  ('C', 'Languages'),
+  ('C++', 'Languages'),
+  ('C#', 'Languages'),
+  ('Go', 'Languages'),
+  ('Java', 'Languages'),
+  ('JavaScript', 'Languages'),
+  ('Python', 'Languages'),
+  ('Rust', 'Languages'),
+  ('SQL', 'Languages'),
+  ('TypeScript', 'Languages'),
+  ('HTML and CSS', 'Web'),
+  ('Next.js', 'Web'),
+  ('React', 'Web'),
+  ('Node.js', 'Backend'),
+  ('REST APIs', 'Backend'),
+  ('PostgreSQL', 'Data'),
+  ('Supabase', 'Data'),
+  ('Machine learning', 'Data and AI'),
+  ('Data analysis', 'Data and AI'),
+  ('Git', 'Tools'),
+  ('Linux', 'Tools'),
+  ('Figma', 'Design'),
+  ('UI and UX design', 'Design'),
+  ('Embedded systems', 'Engineering'),
+  ('Computer vision', 'Data and AI')
+on conflict (canonical_name) do nothing;
