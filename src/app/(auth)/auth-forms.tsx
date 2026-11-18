@@ -24,7 +24,7 @@ function SetupNotice() {
       <p>
         <strong>Account services are not connected.</strong> Add{" "}
         <code>NEXT_PUBLIC_SUPABASE_URL</code> and{" "}
-        <code>NEXT_PUBLIC_SUPABASE_ANON_KEY</code> in Replit Secrets to enable
+        <code>NEXT_PUBLIC_SUPABASE_ANON_KEY</code> to enable
         authentication.
       </p>
     </div>

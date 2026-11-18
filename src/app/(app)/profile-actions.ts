@@ -29,7 +29,7 @@ export async function saveProfileAction(
     return {
       status: "error",
       message:
-        "Profile storage is not connected yet. Add the Supabase URL and anon key in Replit Secrets.",
+        "Profile storage is not connected yet. Add the Supabase URL.",
     };
   }
 

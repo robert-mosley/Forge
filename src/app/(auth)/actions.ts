@@ -15,7 +15,7 @@ import { isProfileComplete } from "@/schemas/profile.schema";
 import { getProfileBundle } from "@/services/profile.service";
 
 const setupMessage =
-  "Account services are not connected yet. Add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY in Replit Secrets.";
+  "Account services are not connected yet. Add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY";
 
 function field(formData: FormData, name: string): string {
   const value = formData.get(name);

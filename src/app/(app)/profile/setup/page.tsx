@@ -20,7 +20,7 @@ export default async function ProfileSetupPage({
     return (
       <WorkspaceMessage
         title="Profile setup is not ready."
-        message="Supabase is not configured. Add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY to .env.local or Replit Secrets, then restart the server."
+        message="Supabase is not configured. Add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY."
         actionHref="/login"
         actionLabel="Open account setup"
       />

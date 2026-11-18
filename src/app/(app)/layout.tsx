@@ -12,7 +12,7 @@ export default async function AppLayout({
       <WorkspaceShell email="Supabase not configured">
         <WorkspaceMessage
           title="Account services are not connected."
-          message="Add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY to your local .env.local file or Replit Secrets, then restart the development server."
+          message="Add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY development server."
           actionHref="/login"
           actionLabel="Open account setup"
         />

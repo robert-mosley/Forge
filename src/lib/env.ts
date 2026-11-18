@@ -22,7 +22,7 @@ export function getSupabasePublicEnv(): SupabasePublicEnv {
 
   if (!parsed.success) {
     throw new Error(
-      "Supabase is not configured. Add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY to Replit Secrets.",
+      "Supabase is not configured. Add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY.",
     );
   }
 
