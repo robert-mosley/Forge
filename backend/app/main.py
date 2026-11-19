@@ -28,7 +28,6 @@ app.add_middleware(
 class PortfolioRequest(BaseModel):
     github_username: str = Field(min_length=1, max_length=39)
 
-
 class Project(BaseModel):
     repo_name: str
     github_url: str
@@ -36,7 +35,6 @@ class Project(BaseModel):
     technical_overview: str
     tech_stack: list[str]
     skills: list[str]
-
 
 class Portfolio(BaseModel):
     username: str
@@ -79,7 +77,6 @@ def github_headers() -> dict[str, str]:
     if token:
         headers["Authorization"] = f"Bearer {token}"
     return headers
-
 
 async def github_get(client: httpx.AsyncClient, path: str) -> Any:
     response = await client.get(path, headers=github_headers())
