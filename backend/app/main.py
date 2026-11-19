@@ -267,8 +267,6 @@ async def rank_portfolio(request: RankRequest) -> RankResponse:
         raise HTTPException(status_code=422, detail="Enter a valid GitHub username.")
 
     project_posts = request.project_posts
-
-    # Call the ranking service
     ranked_projects = await rank_project_posts(username, project_posts)
 
     return RankResponse(username=username, ranked_projects=ranked_projects)
