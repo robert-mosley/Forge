@@ -2,6 +2,7 @@ import Link from "next/link";
 import { requireUser } from "@/lib/auth/require-user";
 import { getProjectFeedMatches, getStudentMatches } from "@/services/matching.service";
 import { toggleProjectAction } from "@/app/(app)/feed-actions";
+import ForgeAIChat from "@/app/(app)/feed/ai-chat";
 
 export const metadata = { title: "Forge feed" };
 
@@ -13,15 +14,39 @@ export default async function FeedPage() {
   ]);
 
   const projectIds = projects.map((project) => project.id);
-  const { data: actions } = projectIds.length
-    ? await supabase
-        .from("project_feed_actions")
-        .select("project_id, action")
-        .eq("user_id", user.id)
-        .in("project_id", projectIds)
-    : { data: [] };
+  const [{ data: actions }, { data: evidence }] = await Promise.all([
+    projectIds.length
+      ? supabase
+          .from("project_feed_actions")
+          .select("project_id, action, user_id")
+          .in("project_id", projectIds)
+      : Promise.resolve({ data: [] }),
+    projectIds.length
+      ? supabase
+          .from("project_evidence")
+          .select("project_id, title, file_name, file_type, file_url")
+          .in("project_id", projectIds)
+      : Promise.resolve({ data: [] }),
+  ]);
 
-  const actionSet = new Set((actions ?? []).map((action) => `${action.project_id}:${action.action}`));
+  const actionSet = new Set(
+    (actions ?? [])
+      .filter((action) => action.user_id === user.id)
+      .map((action) => `${action.project_id}:${action.action}`),
+  );
+
+  const actionCounts = new Map<string, number>();
+  for (const action of actions ?? []) {
+    actionCounts.set(action.project_id, (actionCounts.get(action.project_id) ?? 0) + 1);
+  }
+
+  const evidenceByProject = new Map<string, typeof evidence>();
+  for (const item of evidence ?? []) {
+    evidenceByProject.set(item.project_id, [
+      ...(evidenceByProject.get(item.project_id) ?? []),
+      item,
+    ]);
+  }
 
   return (
     <div className="workspace-page feed-page">
@@ -35,6 +60,7 @@ export default async function FeedPage() {
 
       <div className="feed-layout">
         <main className="feed-main">
+          <ForgeAIChat />
           {projects.length ? projects.map((project) => (
             <article className="feed-card" key={project.id}>
               <div className="feed-card-owner">
@@ -57,6 +83,24 @@ export default async function FeedPage() {
                 <h2>{project.title}</h2>
                 <p>{project.post_summary || project.description || "Explore this engineering project."}</p>
               </Link>
+
+              {(evidenceByProject.get(project.id)?.length ?? 0) > 0 && (
+                <div className="feed-evidence">
+                  {(evidenceByProject.get(project.id) ?? []).slice(0, 3).map((item) => (
+                    item.file_type?.startsWith("image/") ? (
+                      <a href={item.file_url} target="_blank" rel="noreferrer" key={item.file_name}>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={item.file_url} alt={item.title || item.file_name} />
+                      </a>
+                    ) : (
+                      <a className="feed-evidence-file" href={item.file_url} target="_blank" rel="noreferrer" key={item.file_name}>
+                        <span>Document</span>
+                        <strong>{item.title || item.file_name}</strong>
+                      </a>
+                    )
+                  ))}
+                </div>
+              )}
 
               {project.tech_stack?.length > 0 && (
                 <ul className="tag-list">
@@ -86,6 +130,10 @@ export default async function FeedPage() {
                     </button>
                   </form>
                 ))}
+              </div>
+
+              <div className="feed-card-stats">
+                {actionCounts.get(project.id) ?? 0} actions
               </div>
             </article>
           )) : (
