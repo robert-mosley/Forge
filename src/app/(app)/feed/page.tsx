@@ -2,9 +2,9 @@ import Link from "next/link";
 import { requireUser } from "@/lib/auth/require-user";
 import { getProjectFeedMatches, getStudentMatches } from "@/services/matching.service";
 import { toggleProjectAction } from "@/app/(app)/feed-actions";
-import ForgeAIChat from "@/app/(app)/feed/ai-chat";
+import KSUForgeAIChat from "@/app/(app)/feed/ai-chat";
 
-export const metadata = { title: "Forge feed" };
+export const metadata = { title: "KSUForge feed" };
 
 export default async function FeedPage() {
   const { supabase, user } = await requireUser();
@@ -53,14 +53,14 @@ export default async function FeedPage() {
       <header className="feed-heading">
         <div>
           <p className="workspace-eyebrow">Matched for you</p>
-          <h1>Your Forge feed.</h1>
+          <h1>Your KSUForge feed.</h1>
         </div>
         <Link className="workspace-button" href="/projects/new">Post a project</Link>
       </header>
 
       <div className="feed-layout">
         <main className="feed-main">
-          <ForgeAIChat />
+          <KSUForgeAIChat />
           {projects.length ? projects.map((project) => (
             <article className="feed-card" key={project.id}>
               <div className="feed-card-owner">

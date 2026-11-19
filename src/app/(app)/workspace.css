@@ -1432,6 +1432,11 @@
   padding: 1.25rem 0 0;
 }
 
+.engineering-profile-form .skills-fieldset p {
+  margin: 0 0 0.8rem;
+  color: var(--forge-muted);
+}
+
 .engineering-profile-form .skills-fieldset legend {
   float: none;
   width: auto;
@@ -1444,6 +1449,34 @@
 
 .engineering-profile-form .skill-list {
   border-top: 1px solid var(--forge-line);
+}
+
+.engineering-profile-form .skill-search {
+  margin-bottom: 0.7rem;
+}
+
+.engineering-profile-form .skill-search input {
+  width: 100%;
+}
+
+.engineering-profile-form .skill-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0 0 1rem;
+}
+
+.engineering-profile-form .skill-suggestion {
+  border: 1px solid var(--forge-line);
+  background: #fff;
+  color: var(--forge-ink);
+  padding: 0.38rem 0.65rem;
+  font-size: 0.74rem;
+  cursor: pointer;
+}
+
+.engineering-profile-form .skill-suggestion:hover {
+  border-color: #718b2c;
 }
 
 .engineering-profile-form .skill-row {
@@ -1459,6 +1492,31 @@
 .engineering-profile-form .skill-choice {
   min-width: 0;
   font-size: 0.84rem;
+}
+
+.engineering-profile-form .skill-chip-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.engineering-profile-form .skill-chip {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--forge-line);
+  background: #fff;
+  padding: 0.35rem 0.55rem;
+  font-size: 0.78rem;
+}
+
+.engineering-profile-form .skill-remove {
+  border: 0;
+  background: transparent;
+  color: var(--forge-muted);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  cursor: pointer;
 }
 
 .engineering-profile-form .skill-choice span {

@@ -8,7 +8,7 @@ export default function HomePage() {
       </a>
 
       <header className="topbar">
-        <a aria-label="Forge home" className="brand" href="#top">
+        <a aria-label="KSUForge home" className="brand" href="#top">
           <span aria-hidden="true" className="brand-mark">
             <svg fill="none" viewBox="0 0 24 24">
               <path
@@ -20,10 +20,10 @@ export default function HomePage() {
               <path d="M15.5 15.5h4" stroke="currentColor" strokeWidth="2.4" />
             </svg>
           </span>
-          Forge
+          KSUForge
         </a>
         <nav aria-label="Main navigation" className="nav-links">
-          <a href="#principles">Why Forge</a>
+          <a href="#principles">Why KSUForge</a>
           <a href="#approach">Approach</a>
           <Link href="/login">Sign in</Link>
           <Link className="nav-cta" href="/signup">
@@ -35,7 +35,7 @@ export default function HomePage() {
       <main id="main-content">
         <section aria-labelledby="hero-title" className="hero">
           <div className="hero-copy">
-            <div className="hero-kicker eyebrow">KSU · Computer science + engineering</div>
+            <div className="hero-kicker eyebrow">KSU · All majors welcome</div>
             <h1 id="hero-title">
               Good work
               <br />
@@ -44,8 +44,8 @@ export default function HomePage() {
               <span>right mix.</span>
             </h1>
             <p className="hero-description">
-              Forge helps KSU computing students find project teammates with
-              skills that complement their own.
+              KSUForge helps KSU students find passionate scholars to collaborate,
+              inspire each other, and build meaningful work together.
             </p>
             <div className="hero-actions">
               <Link className="button-primary" href="/signup">
@@ -150,7 +150,7 @@ export default function HomePage() {
                 <h2 id="approach-title">A team is a set of useful differences.</h2>
               </div>
               <p>
-                We are shaping Forge around a more thoughtful way to move from
+                We are shaping KSUForge around a more thoughtful way to move from
                 individual interests to a well-balanced project team.
               </p>
             </div>
@@ -181,7 +181,7 @@ export default function HomePage() {
                 </div>
                 <h3>Ground skills in work</h3>
                 <p>
-                  Forge is intended to help connect skills to demonstrated
+                  KSUForge is intended to help connect skills to demonstrated
                   project work—not just a list of claims.
                 </p>
               </article>
@@ -221,23 +221,24 @@ export default function HomePage() {
               They&apos;re built from strengths that meet in the middle.
             </blockquote>
             <p>
-              Forge is being designed for the people behind KSU&apos;s next
-              ambitious build: curious computer science and engineering
-              students ready to make something with others. The point is not
-              another feed. It is a better way to find your people for the work.
+              KSUForge is being designed for the people behind KSU&apos;s next
+              ambitious ideas: curious students from every major who want to
+              create with others. The point is not another feed. It is a better
+              way to find your people for work that matters.
             </p>
           </div>
         </section>
 
         <section aria-labelledby="closing-title" className="closing">
           <div className="closing-inner">
-            <div className="section-index">A note from Forge</div>
+            <div className="section-index">A note from KSUForge</div>
             <div className="closing-copy">
               <h2 id="closing-title">Make room for what you don&apos;t know yet.</h2>
               <p>
-                Forge is an early product direction for KSU&apos;s builders. The
-                foundation comes first: a more credible, considered way to form
-                teams around real skills and real work.
+                KSUForge is an early product direction for KSU&apos;s builders,
+                researchers, creators, and future collaborators across campus.
+                The foundation comes first: a more credible, considered way to
+                form teams around real skills and real work.
               </p>
               <a className="button-primary" href="#top">
                 Back to the beginning <span aria-hidden="true">↑</span>
@@ -260,7 +261,7 @@ export default function HomePage() {
               <path d="M15.5 15.5h4" stroke="currentColor" strokeWidth="2.4" />
             </svg>
           </span>
-          Forge
+          KSUForge
         </a>
         <div className="footer-meta">KSU · For the work ahead · Milestone 01</div>
       </footer>

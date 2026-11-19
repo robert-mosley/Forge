@@ -250,7 +250,7 @@ export async function updatePasswordAction(
   } catch {
     return {
       status: "error",
-      message: "Your password was updated, but Forge could not load your profile. Try signing in.",
+      message: "Your password was updated, but KSUForge could not load your profile. Try signing in.",
     };
   }
 

@@ -25,7 +25,7 @@ export default async function LoginPage({
       description="Sign in to keep building with people whose strengths complement yours."
       footer={
         <p>
-          New to Forge? <Link href="/signup">Create an account</Link>
+          New to KSUForge? <Link href="/signup">Create an account</Link>
         </p>
       }
       kicker="01 / Your workspace"

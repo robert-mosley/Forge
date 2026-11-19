@@ -3,7 +3,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { randomUUID } from "node:crypto";
 import { embedText } from "@/services/embedding.service";
 
-export type ForgeSupabaseClient = SupabaseClient<Database>;
+export type KSUForgeSupabaseClient = SupabaseClient<Database>;
 
 export class ProjectServiceError extends Error {
   constructor(message: string, readonly code?: string, readonly detail?: string) {
@@ -13,7 +13,7 @@ export class ProjectServiceError extends Error {
 }
 
 export async function createOwnProject(
-  supabase: ForgeSupabaseClient,
+  supabase: KSUForgeSupabaseClient,
   userId: string,
   input: {
     title: string;
@@ -76,7 +76,7 @@ export async function createOwnProject(
 }
 
 export async function saveProjectEvidence(
-  supabase: ForgeSupabaseClient,
+  supabase: KSUForgeSupabaseClient,
   userId: string,
   projectId: string,
   files: File[],

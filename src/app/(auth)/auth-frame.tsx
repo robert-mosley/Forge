@@ -23,7 +23,7 @@ export function AuthFrame({
         Skip to form
       </a>
       <header className={styles.masthead}>
-        <Link aria-label="Forge home" className={styles.wordmark} href="/">
+        <Link aria-label="KSUForge home" className={styles.wordmark} href="/">
           <span aria-hidden="true" className={styles.brandMark}>
             <svg fill="none" viewBox="0 0 24 24">
               <path
@@ -35,10 +35,10 @@ export function AuthFrame({
               <path d="M15.5 15.5h4" stroke="currentColor" strokeWidth="2.4" />
             </svg>
           </span>
-          Forge
+          KSUForge
         </Link>
         <Link className={styles.homeLink} href="/">
-          Back to Forge <span aria-hidden="true">↗</span>
+          Back to KSUForge <span aria-hidden="true">↗</span>
         </Link>
       </header>
 
@@ -56,9 +56,9 @@ export function AuthFrame({
           <div className={styles.formFooter}>{footer}</div>
         </section>
 
-        <aside aria-label="Forge's approach to building teams" className={styles.signalPanel}>
+        <aside aria-label="KSUForge's approach to building teams" className={styles.signalPanel}>
           <div className={styles.signalTopline}>
-            <span>Forge / KSU</span>
+            <span>KSUForge / KSU</span>
             <span>Field note 01</span>
           </div>
           <div className={styles.signalArtwork} aria-hidden="true">
@@ -102,7 +102,7 @@ export function AuthFrame({
 
       <footer className={styles.pageFooter}>
         <span>Made for the work ahead.</span>
-        <span>Forge · Kennesaw State University</span>
+        <span>KSUForge · Kennesaw State University</span>
       </footer>
     </div>
   );

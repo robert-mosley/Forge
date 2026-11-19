@@ -22,7 +22,7 @@ export default async function SignupPage() {
     >
       <SignUpForm configured={configured} />
       <span className={styles.formFootnote}>
-        Forge is for KSU computing students.
+        KSUForge is for KSU students.
       </span>
     </AuthFrame>
   );

@@ -1,7 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database";
 
-export type ForgeSupabaseClient = SupabaseClient<Database>;
+export type KSUForgeSupabaseClient = SupabaseClient<Database>;
 
 export type StudentMatch = {
   id: string;
@@ -49,7 +49,7 @@ function overlap(a: string[], b: string[]): string[] {
 }
 
 export async function getStudentMatches(
-  supabase: ForgeSupabaseClient,
+  supabase: KSUForgeSupabaseClient,
   userId: string,
   limit = 12,
 ): Promise<StudentMatch[]> {
@@ -114,7 +114,7 @@ export async function getStudentMatches(
 }
 
 export async function getProjectFeedMatches(
-  supabase: ForgeSupabaseClient,
+  supabase: KSUForgeSupabaseClient,
   userId: string,
   limit = 30,
 ): Promise<ProjectMatch[]> {

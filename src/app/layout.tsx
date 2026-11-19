@@ -3,11 +3,11 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: {
-    default: "Forge — Find your next teammate",
-    template: "%s · Forge",
+    default: "KSUForge — Find your next teammate",
+    template: "%s · KSUForge",
   },
   description:
-    "A collaboration platform for KSU computer science and engineering students. Build with people whose skills complement yours.",
+    "A collaboration platform for KSU students across all majors. Build with people whose skills complement yours.",
 };
 
 export default function RootLayout({

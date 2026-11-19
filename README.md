@@ -1,6 +1,6 @@
-# Forge
+# KSUForge
 
-Forge is a collaboration platform for KSU computer science and engineering
+KSUForge is a collaboration platform for KSU computer science and engineering
 students to find project teammates through demonstrated skills, project work,
 courses, interests, and availability.
 
@@ -13,7 +13,7 @@ npm run dev
 
 ## Account flow
 
-Forge includes `/login`, `/signup`, `/forgot-password`, and
+KSUForge includes `/login`, `/signup`, `/forgot-password`, and
 `/reset-password`, plus protected `/dashboard`, `/profile`, and
 `/profile/setup` routes.
 
@@ -25,7 +25,7 @@ apply the SQL migrations from `supabase/migrations`. Restart `npm run dev` after
 changing environment variables.
 
 For local email confirmation, add `http://localhost:5000/auth/callback` as a
-Supabase redirect URL. After confirmation, Forge sends users to `/profile/setup`.
+Supabase redirect URL. After confirmation, KSUForge sends users to `/profile/setup`.
 Use `localhost:5000` rather than `0.0.0.0:5000` in the browser.
 
 ### Claude portfolio backend

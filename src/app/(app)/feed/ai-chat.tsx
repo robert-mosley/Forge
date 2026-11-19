@@ -26,7 +26,7 @@ type ChatMessage = {
   projects?: ProjectResult[];
 };
 
-export default function ForgeAIChat() {
+export default function KSUForgeAIChat() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -91,7 +91,7 @@ export default function ForgeAIChat() {
           <span className="forge-ai-label">AI DISCOVERY</span>
           <h2>Find your next collaborator.</h2>
           <p>
-            Tell Forge what you want to build, learn, or explore.
+            Tell KSUForge what you want to build, learn, or explore.
           </p>
         </div>
       </div>
@@ -153,7 +153,7 @@ export default function ForgeAIChat() {
 
         {loading && (
           <div className="forge-ai-loading">
-            Forge is finding relevant matches...
+            KSUForge is finding relevant matches...
           </div>
         )}
       </div>
@@ -173,7 +173,7 @@ export default function ForgeAIChat() {
         />
 
         <button disabled={loading || !input.trim()}>
-          {loading ? "Searching..." : "Ask Forge"}
+          {loading ? "Searching..." : "Ask KSUForge"}
         </button>
       </form>
     </section>

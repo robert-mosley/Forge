@@ -13,7 +13,7 @@ export function WorkspaceMessage({
 }) {
   return (
     <section aria-labelledby="workspace-message-title" className="workspace-message">
-      <p className="workspace-eyebrow">Forge setup</p>
+      <p className="workspace-eyebrow">KSUForge setup</p>
       <h1 id="workspace-message-title">{title}</h1>
       <p>{message}</p>
       <Link className="workspace-button" href={actionHref}>

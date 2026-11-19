@@ -9,7 +9,7 @@ export default function ForgotPasswordPage() {
 
   return (
     <AuthFrame
-      description="We’ll send a secure link to the email address on your Forge account."
+      description="We’ll send a secure link to the email address on your KSUForge account."
       footer={
         <p>
           Remembered it? <Link href="/login">Return to sign in</Link>

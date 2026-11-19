@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { GitHubPortfolioImport } from "@/components/profile/github-portfolio-import";
 import { saveProfileAction } from "@/app/(app)/profile-actions";
@@ -18,7 +18,12 @@ const majors = [
   "Mechanical Engineering", "Electrical Engineering", "Civil Engineering",
   "Computer Engineering", "Software Engineering", "Aerospace Engineering",
   "Biomedical Engineering", "Mechatronics", "Industrial Engineering",
-  "Environmental Engineering", "Computer Science", "Other Engineering",
+  "Environmental Engineering", "Computer Science", "Information Technology",
+  "Data Science", "Mathematics", "Physics", "Chemistry", "Biology",
+  "Nursing", "Psychology", "Architecture", "Construction Management",
+  "Business", "Finance", "Accounting", "Marketing", "Economics",
+  "Education", "Political Science", "Criminal Justice", "Journalism",
+  "Digital Media", "Art and Design", "Music", "Theater", "Other",
 ];
 
 const academicYears = ["First year", "Second year", "Third year", "Fourth year", "Graduate", "Alumni"];
@@ -41,6 +46,67 @@ export function EngineeringProfileForm({
 }) {
   const [state, formAction, pending] = useActionState(saveProfileAction, initialFormActionState);
   const selectedById = new Map(selectedSkills.map((skill) => [skill.skill_id, skill.proficiency]));
+
+  const [skillQuery, setSkillQuery] = useState("");
+  const [selectedSkillState, setSelectedSkillState] = useState(() =>
+    selectedSkills
+      .map((selected) => {
+        const skill = skills.find((item) => item.id === selected.skill_id);
+        if (!skill) return null;
+        return {
+          id: skill.id,
+          name: skill.canonical_name,
+          proficiency: selected.proficiency,
+        };
+      })
+      .filter((value): value is { id: string; name: string; proficiency: Proficiency } => Boolean(value)),
+  );
+
+  const selectedIds = useMemo(
+    () => new Set(selectedSkillState.map((skill) => skill.id)),
+    [selectedSkillState],
+  );
+
+  const filteredSkillSuggestions = useMemo(() => {
+    const query = skillQuery.trim().toLowerCase();
+    return skills
+      .filter((skill) => !selectedIds.has(skill.id))
+      .filter((skill) =>
+        query.length === 0
+          ? false
+          : skill.canonical_name.toLowerCase().includes(query),
+      )
+      .slice(0, 8);
+  }, [skills, selectedIds, skillQuery]);
+
+  function addSkill(skill: SkillRow) {
+    setSelectedSkillState((previous) => {
+      if (previous.some((item) => item.id === skill.id) || previous.length >= 12) {
+        return previous;
+      }
+      return [
+        ...previous,
+        {
+          id: skill.id,
+          name: skill.canonical_name,
+          proficiency: selectedById.get(skill.id) ?? "beginner",
+        },
+      ];
+    });
+    setSkillQuery("");
+  }
+
+  function removeSkill(skillId: string) {
+    setSelectedSkillState((previous) => previous.filter((item) => item.id !== skillId));
+  }
+
+  function updateProficiency(skillId: string, proficiency: Proficiency) {
+    setSelectedSkillState((previous) =>
+      previous.map((item) =>
+        item.id === skillId ? { ...item, proficiency } : item,
+      ),
+    );
+  }
 
   return (
     <form action={formAction} className="profile-form engineering-profile-form">
@@ -66,11 +132,12 @@ export function EngineeringProfileForm({
             <input name="username" autoCapitalize="none" maxLength={24} minLength={3} pattern="[A-Za-z0-9_]+" defaultValue={initialProfile?.username ?? ""} placeholder="your_handle" required />
           </label>
           <label className="form-field">
-            <span>Engineering major</span>
-            <input name="major" list="engineering-majors" maxLength={100} defaultValue={initialProfile?.major ?? ""} placeholder="Mechanical engineering" required />
-            <datalist id="engineering-majors">
+            <span>Major or program</span>
+            <input name="major" list="ksu-majors" maxLength={100} defaultValue={initialProfile?.major ?? ""} placeholder="Mechanical Engineering, Marketing, Nursing, ..." required />
+            <datalist id="ksu-majors">
               {majors.map((major) => <option value={major} key={major} />)}
             </datalist>
+            <small>KSUForge is for all KSU majors. Any field is welcome.</small>
           </label>
           <label className="form-field">
             <span>Academic year <em>Optional</em></span>
@@ -88,7 +155,7 @@ export function EngineeringProfileForm({
 
       <section className="onboarding-section">
         <p className="workspace-eyebrow">2 / Direction</p>
-        <h2>What interests you?</h2>
+        <h2>What do you want to build?</h2>
         <label className="form-field form-field-wide">
           <span>Short introduction <em>Optional</em></span>
           <textarea name="bio" maxLength={280} rows={4} defaultValue={initialProfile?.bio ?? ""} placeholder="What kind of problems do you want to solve?" />
@@ -118,17 +185,62 @@ export function EngineeringProfileForm({
         {skills.length > 0 && (
           <fieldset className="skills-fieldset">
             <legend>Skills <em>Optional</em></legend>
+            <p>Type a skill, then choose from suggestions. You can add up to 12.</p>
+            <label className="form-field skill-search" htmlFor="skill-search-input">
+              <span className="sr-only">Search skills</span>
+              <input
+                id="skill-search-input"
+                type="text"
+                value={skillQuery}
+                onChange={(event) => setSkillQuery(event.target.value)}
+                placeholder="Type to find skills..."
+                autoComplete="off"
+                disabled={selectedSkillState.length >= 12}
+              />
+            </label>
+            {filteredSkillSuggestions.length > 0 && (
+              <div className="skill-suggestions" role="listbox" aria-label="Skill suggestions">
+                {filteredSkillSuggestions.map((skill) => (
+                  <button
+                    key={skill.id}
+                    type="button"
+                    className="skill-suggestion"
+                    onClick={() => addSkill(skill)}
+                  >
+                    {skill.canonical_name}
+                  </button>
+                ))}
+              </div>
+            )}
             <div className="skill-list">
-              {skills.map((skill) => (
+              {selectedSkillState.length === 0 && (
+                <p className="workspace-alert">No skills selected yet.</p>
+              )}
+              {selectedSkillState.map((skill) => (
                 <div className="skill-row" key={skill.id}>
-                  <label className="skill-choice">
-                    <input name="skill_id" type="checkbox" value={skill.id} defaultChecked={selectedById.has(skill.id)} />
-                    <span>{skill.canonical_name}</span>
-                  </label>
+                  <div className="skill-chip-wrap">
+                    <input name="skill_id" type="hidden" value={skill.id} />
+                    <span className="skill-chip">{skill.name}</span>
+                    <button
+                      type="button"
+                      className="skill-remove"
+                      onClick={() => removeSkill(skill.id)}
+                      aria-label={`Remove ${skill.name}`}
+                    >
+                      Remove
+                    </button>
+                  </div>
                   <label className="skill-proficiency">
-                    <span className="sr-only">Proficiency for {skill.canonical_name}</span>
-                    <select name={`proficiency:${skill.id}`} defaultValue={selectedById.get(skill.id) ?? "beginner"}>
-                      {proficiencyOptions.map((option) => <option value={option.value} key={option.value}>{option.label}</option>)}
+                    <span className="sr-only">Proficiency for {skill.name}</span>
+                    <select
+                      name={`proficiency:${skill.id}`}
+                      value={skill.proficiency}
+                      onChange={(event) =>
+                        updateProficiency(skill.id, event.target.value as Proficiency)}
+                    >
+                      {proficiencyOptions.map((option) => (
+                        <option value={option.value} key={option.value}>{option.label}</option>
+                      ))}
                     </select>
                   </label>
                 </div>

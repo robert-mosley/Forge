@@ -14,11 +14,11 @@ export function WorkspaceShell({
         Skip to content
       </a>
       <header className="workspace-header">
-        <Link aria-label="Forge dashboard" className="workspace-brand" href="/dashboard">
+        <Link aria-label="KSUForge dashboard" className="workspace-brand" href="/dashboard">
           <span aria-hidden="true" className="workspace-brand-mark">
             F
           </span>
-          Forge
+          KSUForge
         </Link>
         <nav aria-label="Workspace navigation" className="workspace-nav">
           <Link href="/dashboard">Home</Link>
@@ -41,7 +41,7 @@ export function WorkspaceShell({
         {children}
       </main>
       <footer className="workspace-footer">
-        <span>Forge · KSU</span>
+        <span>KSUForge · KSU</span>
         <span>Built around the work ahead.</span>
       </footer>
     </div>

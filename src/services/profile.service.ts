@@ -8,7 +8,7 @@ import type {
 import type { ProfileInput } from "@/schemas/profile.schema";
 import { embedText } from "@/services/embedding.service";
 
-export type ForgeSupabaseClient = SupabaseClient<Database>;
+export type KSUForgeSupabaseClient = SupabaseClient<Database>;
 
 export type ProfileBundle = {
   profile: ProfileRow | null;
@@ -28,7 +28,7 @@ export class ProfileServiceError extends Error {
 }
 
 export async function getProfileBundle(
-  supabase: ForgeSupabaseClient,
+  supabase: KSUForgeSupabaseClient,
   userId: string,
 ): Promise<ProfileBundle> {
   let profileResult = await supabase
@@ -65,7 +65,7 @@ export async function getProfileBundle(
 
   if (failedResult?.error) {
     throw new ProfileServiceError(
-      "Forge could not load profile data. Confirm the latest Supabase migrations are applied.",
+      "KSUForge could not load profile data. Confirm the latest Supabase migrations are applied.",
       failedResult.error.code,
     );
   }
@@ -78,7 +78,7 @@ export async function getProfileBundle(
 }
 
 export async function saveOwnProfile(
-  supabase: ForgeSupabaseClient,
+  supabase: KSUForgeSupabaseClient,
   userId: string,
   input: ProfileInput,
 ): Promise<void> {

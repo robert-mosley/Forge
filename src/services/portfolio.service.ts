@@ -1,4 +1,4 @@
-import type { ForgeSupabaseClient } from "@/services/profile.service";
+import type { KSUForgeSupabaseClient } from "@/services/profile.service";
 import type { GitHubPortfolio } from "@/services/github.service";
 
 export class PortfolioImportError extends Error {
@@ -20,7 +20,7 @@ function generatedUsername(githubUsername: string, userId: string): string {
 }
 
 export async function importGitHubPortfolio(
-  supabase: ForgeSupabaseClient,
+  supabase: KSUForgeSupabaseClient,
   userId: string,
   portfolio: GitHubPortfolio,
 ): Promise<void> {
@@ -101,7 +101,7 @@ export async function importGitHubPortfolio(
 
     if (projectError || !savedProject) {
       throw new PortfolioImportError(
-        `Forge could not save the GitHub project ${project.repo_name}.`,
+        `KSUForge could not save the GitHub project ${project.repo_name}.`,
       );
     }
 
@@ -127,7 +127,7 @@ export async function importGitHubPortfolio(
 
       if (evidenceError) {
         throw new PortfolioImportError(
-          `Forge could not save skill evidence for ${project.repo_name}.`,
+          `KSUForge could not save skill evidence for ${project.repo_name}.`,
         );
       }
     }

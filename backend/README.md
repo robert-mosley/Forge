@@ -1,4 +1,4 @@
-# Forge FastAPI backend
+# KSUForge FastAPI backend
 
 ## Run locally
 

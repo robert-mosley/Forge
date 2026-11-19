@@ -15,10 +15,10 @@ export default async function ResetPasswordPage() {
   if (!configured) {
     return (
       <AuthFrame
-        description="Forge cannot securely verify an account until its authentication service is connected."
+        description="KSUForge cannot securely verify an account until its authentication service is connected."
         footer={
           <p>
-            <Link href="/">Return to Forge</Link>
+            <Link href="/">Return to KSUForge</Link>
           </p>
         }
         kicker="Account recovery"
@@ -65,7 +65,7 @@ export default async function ResetPasswordPage() {
 
   return (
     <AuthFrame
-      description="Choose a new password for your Forge account."
+      description="Choose a new password for your KSUForge account."
       footer={
         <p>
           Need another link? <Link href="/forgot-password">Request a reset</Link>
@@ -76,7 +76,7 @@ export default async function ResetPasswordPage() {
     >
       <ResetPasswordForm configured={configured} />
       <span className={styles.formFootnote}>
-        After updating it, you can continue into Forge.
+        After updating it, you can continue into KSUForge.
       </span>
     </AuthFrame>
   );

@@ -14,7 +14,7 @@ from services.candidate_videos import rank_project_posts
 
 load_dotenv(".env")
 
-app = FastAPI(title="Forge Portfolio API", version="1.0.0")
+app = FastAPI(title="KSUForge Portfolio API", version="1.0.0")
 
 app_origin = os.getenv("NEXT_PUBLIC_APP_ORIGIN", "http://localhost:5000")
 app.add_middleware(
@@ -143,7 +143,7 @@ async def _verified_supabase_user(
     async with httpx.AsyncClient(base_url=supabase_url, timeout=20.0) as client:
         response = await client.get("/auth/v1/user", headers={"apikey": supabase_key, "Authorization": f"Bearer {access_token}"})
     if response.status_code != 200:
-        raise HTTPException(status_code=401, detail="Your Forge session is no longer valid.")
+        raise HTTPException(status_code=401, detail="Your KSUForge session is no longer valid.")
     payload = response.json()
     return payload if isinstance(payload, dict) else {}
 
@@ -330,7 +330,7 @@ async def ai_chat(
     if not api_key:
         raise HTTPException(status_code=503, detail="Claude is not configured for the AI backend.")
 
-    intent_prompt = f"""Analyze this Forge student collaboration request.
+    intent_prompt = f"""Analyze this KSUForge student collaboration request.
 
 Current student:
 {json.dumps(current_profile or {}, ensure_ascii=False)}

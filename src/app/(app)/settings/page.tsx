@@ -10,7 +10,7 @@ export default async function SettingsPage() {
     <div className="workspace-page">
       <p className="workspace-eyebrow">Account / Settings</p>
       <h1>Profile preferences.</h1>
-      <p className="workspace-lede">Control your Forge profile and account details.</p>
+      <p className="workspace-lede">Control your KSUForge profile and account details.</p>
 
       <section className="settings-grid">
         <Link href="/profile?edit=1">

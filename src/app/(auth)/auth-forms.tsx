@@ -103,7 +103,7 @@ export function SignInForm({ configured }: { configured: boolean }) {
         type="password"
       />
       <div className={styles.fieldMeta}>
-        <span>Use the password for your Forge account.</span>
+        <span>Use the password for your KSUForge account.</span>
         <Link href="/forgot-password">Forgot password?</Link>
       </div>
       <ActionFeedback state={state} />
@@ -171,7 +171,7 @@ export function ForgotPasswordForm({ configured }: { configured: boolean }) {
       {!configured ? <SetupNotice /> : null}
       <Field
         autoComplete="email"
-        hint="Use the address associated with your Forge account."
+        hint="Use the address associated with your KSUForge account."
         label="Email address"
         name="email"
         type="email"

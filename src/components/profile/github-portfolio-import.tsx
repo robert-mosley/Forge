@@ -29,8 +29,9 @@ export function GitHubPortfolioImport({
             : "Build a first draft from your work."}
         </h2>
         <p>
-          Forge will inspect your public repositories, infer the technologies you
-          use, and add project evidence to your profile.
+          KSUForge will inspect your public repositories, infer the technologies you
+          use, and add project evidence to your profile. Built for makers and
+          engineers, open to every KSU major.
         </p>
       </div>
 

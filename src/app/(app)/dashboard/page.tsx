@@ -22,7 +22,7 @@ export default async function DashboardPage({
   } catch (error) {
     return (
       <WorkspaceMessage
-        title="Forge needs its database setup."
+        title="KSUForge needs its database setup."
         message={
           error instanceof ProfileServiceError
             ? error.message

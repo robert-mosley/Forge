@@ -87,7 +87,7 @@ export function ProjectForm({ returnTo = "/dashboard" }: { returnTo?: string }) 
 
       <label className="onboarding-check">
         <input name="is_public" type="checkbox" defaultChecked />
-        <span>Show this project on my public Forge portfolio</span>
+        <span>Show this project on my public KSUForge portfolio</span>
       </label>
 
       {state.message && (

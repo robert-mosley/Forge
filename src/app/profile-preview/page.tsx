@@ -57,7 +57,7 @@ export default function ProfilePreviewPage() {
   return (
     <main className="preview-page">
       <header className="preview-header">
-        <a className="preview-brand" href="/">Forge</a>
+        <a className="preview-brand" href="/">KSUForge</a>
         <a className="preview-login" href="/login">Sign in</a>
       </header>
 

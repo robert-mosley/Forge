@@ -9,7 +9,7 @@ export async function POST(request: NextRequest) {
   } = await supabase.auth.getSession();
 
   if (error || !session) {
-    return NextResponse.json({ error: "You must be signed in to use Forge AI." }, { status: 401 });
+    return NextResponse.json({ error: "You must be signed in to use KSUForge AI." }, { status: 401 });
   }
 
   const body = await request.json().catch(() => null) as {
