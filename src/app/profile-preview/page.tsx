@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState, type FormEvent } from "react";
 
 type PortfolioProject = {
@@ -57,8 +58,8 @@ export default function ProfilePreviewPage() {
   return (
     <main className="preview-page">
       <header className="preview-header">
-        <a className="preview-brand" href="/">KSUForge</a>
-        <a className="preview-login" href="/login">Sign in</a>
+        <Link className="preview-brand" href="/">KSUForge</Link>
+        <Link className="preview-login" href="/login">Sign in</Link>
       </header>
 
       <section className="preview-generator">
@@ -93,9 +94,9 @@ export default function ProfilePreviewPage() {
             <h2>{portfolio.display_name || portfolio.username}</h2>
             <p className="preview-headline">{portfolio.headline}</p>
             <p className="preview-summary">{portfolio.profile_summary}</p>
-            <a href={`https://github.com/${portfolio.username}`} rel="noreferrer" target="_blank">
+            <Link href={`https://github.com/${portfolio.username}`} target="_blank" rel="noreferrer">
               github.com/{portfolio.username} ↗
-            </a>
+            </Link>
           </header>
 
           <section className="preview-skills">
@@ -120,7 +121,7 @@ export default function ProfilePreviewPage() {
                       <li key={technology}>{technology}</li>
                     ))}
                   </ul>
-                  <a href={project.github_url} rel="noreferrer" target="_blank">View repository ↗</a>
+                  <Link href={project.github_url} rel="noreferrer" target="_blank">View repository ↗</Link>
                 </article>
               ))}
             </div>

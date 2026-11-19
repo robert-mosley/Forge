@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { WorkspaceMessage } from "@/components/app/workspace-message";
 import { requireUser } from "@/lib/auth/require-user";
 import { isProfileComplete } from "@/schemas/profile.schema";
@@ -131,8 +132,13 @@ export default async function DashboardPage({
             {recommendedStudents.map((student) => (
               <Link className="student-card" href={`/students/${student.username}`} key={student.id}>
                 {student.profile_picture_url ? (
-                  // eslint-disable-next-next-line @next/next/no-img-element
-                  <img className="student-card-image" src={student.profile_picture_url} alt="" />
+                  <Image
+                    className="student-card-image"
+                    src={student.profile_picture_url}
+                    alt={`${student.full_name || student.username || "Student"} profile picture`}
+                    width={64}
+                    height={64}
+                  />
                 ) : (
                   <span className="student-avatar" aria-hidden="true">{(student.full_name || student.username || "S").slice(0, 1).toUpperCase()}</span>
                 )}
