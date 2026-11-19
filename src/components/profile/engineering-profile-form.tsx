@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { Button } from "@/components/ui/button";
+import { GitHubPortfolioImport } from "@/components/profile/github-portfolio-import";
 import { saveProfileAction } from "@/app/(app)/profile-actions";
 import { initialFormActionState } from "@/lib/forms";
 import type { ProfileRow, Proficiency, SkillRow, StudentSkillRow } from "@/types/database";
@@ -108,6 +109,12 @@ export function EngineeringProfileForm({
       <section className="onboarding-section">
         <p className="workspace-eyebrow">3 / Skills and links</p>
         <h2>Choose what you can contribute.</h2>
+        {mode === "edit" && (
+          <GitHubPortfolioImport
+            githubUsername={initialProfile?.github_username ?? null}
+            mode="edit"
+          />
+        )}
         {skills.length > 0 && (
           <fieldset className="skills-fieldset">
             <legend>Skills <em>Optional</em></legend>

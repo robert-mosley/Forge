@@ -146,6 +146,7 @@ export async function importGitHubPortfolioAction(
   }
 
   const githubUsername = textField(formData, "github_username").replace(/^@/, "").trim();
+  const returnTo = textField(formData, "return_to");
   if (!githubUsername) {
     return { status: "error", message: "Enter your GitHub username first." };
   }
@@ -154,7 +155,7 @@ export async function importGitHubPortfolioAction(
     const portfolio = await generateClaudePortfolio(githubUsername);
     await importGitHubPortfolio(supabase, user.id, portfolio);
 
-    redirect("/profile/setup?imported=1");
+    redirect(returnTo === "/profile?edit=1" ? "/profile?edit=1&imported=1" : "/profile/setup?imported=1");
   } catch (error) {
     if (error && typeof error === "object" && "digest" in error) {
       throw error;

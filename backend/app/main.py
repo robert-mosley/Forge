@@ -152,6 +152,34 @@ def _text(value: Any) -> str:
     return str(value).strip() if value is not None else ""
 
 
+def _extract_github_username(text: str) -> str | None:
+    url_match = re.search(r"github\.com/([A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?)", text, flags=re.IGNORECASE)
+    if url_match:
+        return url_match.group(1)
+
+    handle_match = re.search(r"@([A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?)", text)
+    if handle_match and "github" in text.lower():
+        return handle_match.group(1)
+
+    plain_match = re.search(
+        r"(?:github(?:\s+username)?\s*(?:is|:)?\s*)([A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?)",
+        text,
+        flags=re.IGNORECASE,
+    )
+    if plain_match:
+        return plain_match.group(1)
+
+    return None
+
+
+def _is_github_portfolio_request(text: str) -> bool:
+    normalized = text.lower()
+    mentions_portfolio = "portfolio" in normalized or "profile" in normalized
+    mentions_github = "github" in normalized
+    action_words = ("generate", "create", "build", "import", "make")
+    return mentions_portfolio and mentions_github and any(word in normalized for word in action_words)
+
+
 @app.post("/ai/chat")
 async def ai_chat(
     request: ChatRequest,
@@ -170,6 +198,44 @@ async def ai_chat(
     user_id = _text(auth_user.get("id"))
     if not user_id:
         raise HTTPException(status_code=401, detail="Authentication is required.")
+
+    if _is_github_portfolio_request(request.message):
+        github_username = _extract_github_username(request.message)
+        if not github_username:
+            return {
+                "message": "I can generate your portfolio from GitHub. Share your GitHub username (or a github.com profile URL) and I will build it.",
+                "students": [],
+                "projects": [],
+            }
+
+        generated_portfolio = await generate_portfolio(PortfolioRequest(github_username=github_username))
+        generated_projects = [
+            {
+                "id": f"github:{project.repo_name}",
+                "title": project.repo_name,
+                "description": project.description,
+                "discipline": None,
+                "project_type": "Imported from GitHub",
+                "tech_stack": project.tech_stack,
+                "collaboration_roles": [],
+                "seeking_collaborators": False,
+                "github_url": project.github_url,
+                "owner_username": generated_portfolio.username,
+                "owner_name": generated_portfolio.display_name or generated_portfolio.username,
+                "score": 100,
+                "match_reason": project.technical_overview,
+            }
+            for project in generated_portfolio.projects[:6]
+        ]
+
+        return {
+            "message": (
+                f"I generated a portfolio from @{generated_portfolio.username}. "
+                f"Headline: {generated_portfolio.headline}"
+            ),
+            "students": [],
+            "projects": generated_projects,
+        }
 
     profiles = await _supabase_rest_get(
         "/rest/v1/profiles?select=id,username,full_name,major,campus,academic_year,bio,profile_picture_url,interests,embedding&is_discoverable=eq.true&limit=200",

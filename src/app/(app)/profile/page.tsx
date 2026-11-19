@@ -14,7 +14,7 @@ export const metadata = { title: "My profile" };
 export default async function ProfilePage({
   searchParams,
 }: {
-  searchParams: Promise<{ updated?: string; edit?: string }>;
+  searchParams: Promise<{ updated?: string; edit?: string; imported?: string }>;
 }) {
   const { supabase, user } = await requireUser();
 
@@ -49,6 +49,11 @@ export default async function ProfilePage({
           {params.updated === "1" && (
             <p className="workspace-success" role="status">
               Your profile has been updated.
+            </p>
+          )}
+          {params.imported === "1" && (
+            <p className="workspace-success" role="status">
+              GitHub portfolio imported. Review and save any profile field updates.
             </p>
           )}
           <EngineeringProfileForm

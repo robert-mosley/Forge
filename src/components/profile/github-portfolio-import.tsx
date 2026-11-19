@@ -7,8 +7,10 @@ import { importGitHubPortfolioAction } from "@/app/(app)/profile-actions";
 
 export function GitHubPortfolioImport({
   githubUsername,
+  mode = "setup",
 }: {
   githubUsername: string | null;
+  mode?: "setup" | "edit";
 }) {
   const [state, formAction, pending] = useActionState(
     importGitHubPortfolioAction,
@@ -18,8 +20,14 @@ export function GitHubPortfolioImport({
   return (
     <section className="github-import-panel" aria-labelledby="github-import-title">
       <div>
-        <p className="workspace-eyebrow">Start with GitHub</p>
-        <h2 id="github-import-title">Build a first draft from your work.</h2>
+        <p className="workspace-eyebrow">
+          {mode === "edit" ? "Refresh from GitHub" : "Start with GitHub"}
+        </p>
+        <h2 id="github-import-title">
+          {mode === "edit"
+            ? "Regenerate your portfolio from your latest repositories."
+            : "Build a first draft from your work."}
+        </h2>
         <p>
           Forge will inspect your public repositories, infer the technologies you
           use, and add project evidence to your profile.
@@ -40,6 +48,7 @@ export function GitHubPortfolioImport({
             required
           />
         </label>
+        <input name="return_to" type="hidden" value={mode === "edit" ? "/profile?edit=1" : "/profile/setup"} />
         {state.message && (
           <p className={state.status === "error" ? "form-error" : "form-success"} role="alert">
             {state.message}

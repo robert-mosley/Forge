@@ -103,6 +103,7 @@ export default function ForgeAIChat() {
             "Help me find teammates for an AI project",
             "Find students with cybersecurity experience",
             "Show me interesting projects to contribute to",
+            "Generate my portfolio from GitHub: github.com/your-username",
           ].map((suggestion) => (
             <button
               key={suggestion}
