@@ -59,6 +59,22 @@ export function ProjectForm({ returnTo = "/dashboard" }: { returnTo?: string }) 
           <textarea name="outcomes" maxLength={2000} rows={3} placeholder="Performance, competition placement, testing data, published work…" />
         </label>
         <label className="form-field form-field-wide">
+          <span>Feed summary <em>Optional</em></span>
+          <textarea name="post_summary" maxLength={500} rows={3} placeholder="Introduce the project to potential teammates in a few sentences." />
+        </label>
+        <label className="form-field">
+          <span>Looking for teammates <em>Optional</em></span>
+          <label className="onboarding-check">
+            <input name="seeking_collaborators" type="checkbox" />
+            <span>Include this project in team matching</span>
+          </label>
+        </label>
+        <label className="form-field">
+          <span>Roles needed <em>Optional</em></span>
+          <input name="collaboration_roles" maxLength={300} placeholder="Mechanical designer, embedded engineer" />
+          <small>Separate roles with commas.</small>
+        </label>
+        <label className="form-field form-field-wide">
           <span>GitHub repository <em>Optional</em></span>
           <input name="github_url" type="url" placeholder="https://github.com/username/project" />
         </label>

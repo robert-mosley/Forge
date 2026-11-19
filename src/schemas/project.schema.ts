@@ -14,6 +14,9 @@ export const projectSchema = z.object({
     z.string().trim().url("Enter a valid repository URL.").nullable().optional(),
   ),
   is_public: z.boolean().default(true),
+  seeking_collaborators: z.boolean().default(false),
+  collaboration_roles: z.array(z.string().trim().min(1)).max(10).default([]),
+  post_summary: z.string().trim().max(500).default(""),
 });
 
 export type ProjectInput = z.infer<typeof projectSchema>;

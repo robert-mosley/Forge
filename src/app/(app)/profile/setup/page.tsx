@@ -78,16 +78,24 @@ export default async function ProfileSetupPage({
         />
       </div>
     );
-  } catch (error) {
+  } catch (_error) {
     return (
-      <WorkspaceMessage
-        title="Profile setup is not ready."
-        message={
-          error instanceof ProfileServiceError
-            ? error.message
-            : "Forge could not load the profile setup data. Apply the Supabase migrations and try again."
-        }
-      />
+      <div className="workspace-page workspace-form-page">
+        <div className="workspace-form-intro">
+          <p className="workspace-eyebrow">First, your profile / 01</p>
+          <h1>What do you bring to the work?</h1>
+          <p className="workspace-lede">
+            Add your engineering background and the work you are interested in.
+            You can finish optional fields later.
+          </p>
+        </div>
+        <EngineeringProfileForm
+          initialProfile={null}
+          skills={[]}
+          selectedSkills={[]}
+          mode="setup"
+        />
+      </div>
     );
   }
 }

@@ -1,3 +1,5 @@
+create extension vector
+
 create table public.profiles (
   id uuid primary key references auth.users (id) on delete cascade,
   username text unique,
@@ -6,7 +8,8 @@ create table public.profiles (
   campus text,
   bio text,
   github_username text,
-  created_at timestamptz not null default now()
+  created_at timestamptz not null default now(),
+  embedding vector(384),
 );
 
 create table public.projects (
@@ -19,7 +22,8 @@ create table public.projects (
   tech_stack text[] not null default '{}',
   processing_status text not null default 'pending'
     check (processing_status in ('pending', 'processing', 'ready', 'failed')),
-  created_at timestamptz not null default now()
+  created_at timestamptz not null default now(),
+  embedding vector(384)
 );
 
 create table public.skills (

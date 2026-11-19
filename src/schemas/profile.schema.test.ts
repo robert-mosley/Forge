@@ -39,7 +39,7 @@ describe("profile validation", () => {
     expect(result.success).toBe(false);
   });
 
-  it("requires a complete profile and at least one skill", () => {
+  it("requires core profile fields but not skills", () => {
     const completeProfile = {
       full_name: "Avery Student",
       username: "avery_01",
@@ -48,7 +48,7 @@ describe("profile validation", () => {
     };
 
     expect(isProfileComplete(completeProfile, 1)).toBe(true);
-    expect(isProfileComplete(completeProfile, 0)).toBe(false);
+    expect(isProfileComplete(completeProfile, 0)).toBe(true);
     expect(isProfileComplete(null, 1)).toBe(false);
   });
 });

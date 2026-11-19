@@ -26,6 +26,7 @@ export function WorkspaceShell({
           <Link href="/projects">Projects</Link>
           <Link href="/profile">My profile</Link>
           <Link href="/settings">Settings</Link>
+          <Link href="/feed">Feed</Link>
         </nav>
         <div className="workspace-account">
           <span className="workspace-email">{email}</span>

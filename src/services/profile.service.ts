@@ -6,6 +6,7 @@ import type {
   StudentSkillRow,
 } from "@/types/database";
 import type { ProfileInput } from "@/schemas/profile.schema";
+import { embedText } from "@/services/embedding.service";
 
 export type ForgeSupabaseClient = SupabaseClient<Database>;
 
@@ -19,6 +20,7 @@ export class ProfileServiceError extends Error {
   constructor(
     message: string,
     readonly code?: string,
+    readonly detail?: string,
   ) {
     super(message);
     this.name = "ProfileServiceError";
@@ -29,14 +31,23 @@ export async function getProfileBundle(
   supabase: ForgeSupabaseClient,
   userId: string,
 ): Promise<ProfileBundle> {
-  const [profileResult, skillResult, selectedResult] = await Promise.all([
-    supabase
+  let profileResult = await supabase
+    .from("profiles")
+    .select(
+      "id, username, full_name, major, campus, bio, github_username, github_url, profile_picture_url, academic_year, interests, is_discoverable, show_availability, embedding, created_at",
+    )
+    .eq("id", userId)
+    .maybeSingle();
+
+  if (profileResult.error?.code === "PGRST204") {
+    profileResult = await supabase
       .from("profiles")
-      .select(
-        "id, username, full_name, major, campus, bio, github_username, github_url, profile_picture_url, academic_year, interests, is_discoverable, show_availability, created_at",
-      )
+      .select("id, username, full_name, major, campus, bio, github_username, created_at")
       .eq("id", userId)
-      .maybeSingle(),
+      .maybeSingle();
+  }
+
+  const [skillResult, selectedResult] = await Promise.all([
     supabase
       .from("skills")
       .select("id, canonical_name, category, created_at")
@@ -48,7 +59,7 @@ export async function getProfileBundle(
       .eq("user_id", userId),
   ]);
 
-  const failedResult = [profileResult, skillResult, selectedResult].find(
+  const failedResult = [profileResult, skillResult].find(
     (result) => result.error,
   );
 
@@ -71,18 +82,13 @@ export async function saveOwnProfile(
   userId: string,
   input: ProfileInput,
 ): Promise<void> {
-  const { data: existingSkills, error: existingError } = await supabase
+  const existingSkillsResult = await supabase
     .from("student_skills")
     .select("skill_id")
     .eq("user_id", userId)
     .eq("source", "manual");
 
-  if (existingError) {
-    throw new ProfileServiceError(
-      "Forge could not load your current skills. Confirm the latest Supabase migrations are applied.",
-      existingError.code,
-    );
-  }
+  const { data: existingSkills } = existingSkillsResult;
 
   const { error: profileError } = await supabase.from("profiles").upsert(
     {
@@ -99,21 +105,43 @@ export async function saveOwnProfile(
       interests: input.interests,
       is_discoverable: input.is_discoverable,
       show_availability: input.show_availability,
+      embedding: await embedText([
+        input.full_name,
+        input.major,
+        input.campus,
+        input.bio,
+        input.interests.join(" "),
+        input.skills.map((skill) => skill.skill_id).join(" "),
+      ].filter(Boolean).join(" ")),
     },
     { onConflict: "id" },
   );
 
-  if (profileError) {
-    if (profileError.code === "23505") {
-      throw new ProfileServiceError(
-        "That username is already taken. Try another one.",
-        profileError.code,
-      );
-    }
+  let resolvedProfileError = profileError;
+  if (profileError?.code === "PGRST204" || profileError?.code === "42703") {
+    const baseResult = await supabase.from("profiles").upsert(
+      {
+        id: userId,
+        username: input.username,
+        full_name: input.full_name,
+        major: input.major,
+        campus: input.campus,
+        bio: input.bio,
+        github_username: input.github_username,
+      },
+      { onConflict: "id" },
+    );
+    resolvedProfileError = baseResult.error;
+  }
 
+  if (resolvedProfileError) {
+    const databaseMessage = resolvedProfileError.message?.trim();
     throw new ProfileServiceError(
-      "Your profile could not be saved. Please try again.",
-      profileError.code,
+      databaseMessage
+        ? `Your profile could not be saved: ${databaseMessage}`
+        : "Your profile could not be saved. Please try again.",
+      resolvedProfileError.code,
+      resolvedProfileError.details,
     );
   }
 
@@ -122,21 +150,23 @@ export async function saveOwnProfile(
     .map((skill) => skill.skill_id)
     .filter((skillId) => !selectedIds.has(skillId));
 
-  const { error: upsertError } = await supabase.from("student_skills").upsert(
-    input.skills.map((skill) => ({
-      user_id: userId,
-      skill_id: skill.skill_id,
-      proficiency: skill.proficiency,
-      source: "manual" as const,
-    })),
-    { onConflict: "user_id,skill_id,source" },
-  );
-
-  if (upsertError) {
-    throw new ProfileServiceError(
-      "Your profile details were saved, but your skills could not be updated. Please try again.",
-      upsertError.code,
+  if (input.skills.length > 0) {
+    const { error: upsertError } = await supabase.from("student_skills").upsert(
+      input.skills.map((skill) => ({
+        user_id: userId,
+        skill_id: skill.skill_id,
+        proficiency: skill.proficiency,
+        source: "manual" as const,
+      })),
+      { onConflict: "user_id,skill_id,source" },
     );
+
+    if (upsertError) {
+      throw new ProfileServiceError(
+        "Your profile details were saved, but your skills could not be updated. Please try again.",
+        upsertError.code,
+      );
+    }
   }
 
   if (removedIds.length > 0) {

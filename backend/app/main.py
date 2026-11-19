@@ -10,6 +10,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from dotenv import load_dotenv
+from services.candidate_videos import rank_project_posts
 
 load_dotenv(".env")
 
@@ -23,7 +24,6 @@ app.add_middleware(
     allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["*"],
 )
-
 
 class PortfolioRequest(BaseModel):
     github_username: str = Field(min_length=1, max_length=39)
@@ -48,6 +48,17 @@ class Portfolio(BaseModel):
     skills: list[str]
 
 
+class FeedCandidate(BaseModel):
+    id: str
+    data: dict[str, Any] = Field(default_factory=dict)
+    base_score: float = 0.0
+
+
+class FeedRankingRequest(BaseModel):
+    profile_embedding: list[float] | None = None
+    candidates: list[FeedCandidate]
+
+
 def github_headers() -> dict[str, str]:
     headers = {
         "Accept": "application/vnd.github+json",
@@ -69,7 +80,6 @@ async def github_get(client: httpx.AsyncClient, path: str) -> Any:
     if response.status_code >= 400:
         raise HTTPException(status_code=502, detail=f"GitHub request failed ({response.status_code}).")
     return response.json()
-
 
 def clean_markdown(markdown: str) -> str:
     markdown = re.sub(r"```.*?```", " ", markdown, flags=re.DOTALL)
@@ -232,3 +242,48 @@ Guidelines:
         projects=projects,
         skills=[str(skill) for skill in generated.get("skills", [])][:12],
     )
+
+
+class RankRequest(BaseModel):
+    github_username: str = Field(min_length=1, max_length=39)
+    project_posts: list[dict[str, Any]]
+
+
+class RankedProject(BaseModel):
+    repo_name: str
+    github_url: str
+    rank: int
+
+
+class RankResponse(BaseModel):
+    username: str
+    ranked_projects: list[RankedProject]
+
+
+@app.post("/portfolio/rank", response_model=RankResponse)
+async def rank_portfolio(request: RankRequest) -> RankResponse:
+    username = request.github_username.strip().lstrip("@").strip()
+    if not re.fullmatch(r"[A-Za-z0-9](?:[A-Za-z0-9-]{0,37}[A-Za-z0-9])?", username):
+        raise HTTPException(status_code=422, detail="Enter a valid GitHub username.")
+
+    project_posts = request.project_posts
+
+    # Call the ranking service
+    ranked_projects = await rank_project_posts(username, project_posts)
+
+    return RankResponse(username=username, ranked_projects=ranked_projects)
+
+
+@app.post("/feed/rank")
+def rank_feed(request: FeedRankingRequest) -> dict[str, Any]:
+    candidates = [
+        {
+            "id": candidate.id,
+            **candidate.data,
+            "base_score": candidate.base_score,
+        }
+        for candidate in request.candidates
+    ]
+
+    ranked = rank_project_posts(request.profile_embedding, candidates)
+    return {"projects": ranked}

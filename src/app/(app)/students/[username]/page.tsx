@@ -59,7 +59,7 @@ export default async function StudentProfilePage({
             {student.major || "Engineering student"}{student.academic_year ? ` · ${student.academic_year}` : ""}{student.campus ? ` · ${student.campus}` : ""}
           </p>
           {student.bio && <p className="portfolio-summary">{student.bio}</p>}
-        </header>
+        </div>
 
         <div className="portfolio-actions">
           {githubUrl && <a className="workspace-button" href={githubUrl} target="_blank" rel="noreferrer">GitHub ↗</a>}

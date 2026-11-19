@@ -42,6 +42,14 @@ export async function createProjectAction(
       .filter(Boolean),
     github_url: textField(formData, "github_url") || null,
     is_public: formData.get("is_public") !== "off",
+    seeking_collaborators: formData.get("seeking_collaborators") === "on",
+    collaboration_roles: formData
+      .getAll("collaboration_roles")
+      .filter((value): value is string => typeof value === "string")
+      .flatMap((value) => value.split(","))
+      .map((value) => value.trim())
+      .filter(Boolean),
+    post_summary: textField(formData, "post_summary"),
   });
 
   if (!parsed.success) {
@@ -49,7 +57,10 @@ export async function createProjectAction(
   }
 
   try {
-    const project = await createOwnProject(supabase, user.id, parsed.data);
+    const project = await createOwnProject(supabase, user.id, {
+      ...parsed.data,
+      github_url: parsed.data.github_url ?? null,
+    });
 
     const evidenceFiles = formData
       .getAll("evidence")

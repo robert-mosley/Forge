@@ -93,9 +93,9 @@ export default async function DashboardPage({
           <span>01 / Portfolio</span>
           <strong>{ownProjects?.length ? "Add another project" : "Add your first project"}</strong>
         </Link>
-        <Link href="/discover">
-          <span>02 / Collaborators</span>
-          <strong>Discover students</strong>
+        <Link href="/feed">
+          <span>02 / Matching feed</span>
+          <strong>Find projects and teammates</strong>
         </Link>
         <Link href="/profile?edit=1">
           <span>03 / Profile</span>

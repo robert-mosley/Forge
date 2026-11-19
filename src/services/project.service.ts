@@ -1,11 +1,12 @@
 import type { Database } from "@/types/database";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { randomUUID } from "node:crypto";
+import { embedText } from "@/services/embedding.service";
 
 export type ForgeSupabaseClient = SupabaseClient<Database>;
 
 export class ProjectServiceError extends Error {
-  constructor(message: string, readonly code?: string) {
+  constructor(message: string, readonly code?: string, readonly detail?: string) {
     super(message);
     this.name = "ProjectServiceError";
   }
@@ -25,6 +26,9 @@ export async function createOwnProject(
     tech_stack: string[];
     github_url: string | null;
     is_public: boolean;
+    seeking_collaborators: boolean;
+    collaboration_roles: string[];
+    post_summary: string;
   },
 ) {
   const repoName = input.title
@@ -35,7 +39,7 @@ export async function createOwnProject(
 
   const { data, error } = await supabase
     .from("projects")
-    .insert({
+    .upsert({
       user_id: userId,
       repo_name: repoName,
       title: input.title,
@@ -50,14 +54,21 @@ export async function createOwnProject(
       github_url: input.github_url,
       processing_status: "ready",
       is_public: input.is_public,
-    })
+      seeking_collaborators: input.seeking_collaborators,
+      collaboration_roles: input.collaboration_roles,
+      post_summary: input.post_summary || null,
+      embedding: await embedText(`${input.title} ${input.description}`),
+    }, { onConflict: "user_id,repo_name" })
     .select("id")
     .single();
 
   if (error || !data) {
     throw new ProjectServiceError(
-      "Your project could not be saved. Please try again.",
+      error?.message?.trim()
+        ? `Your project could not be saved: ${error.message}`
+        : "Your project could not be saved. Please try again.",
       error?.code,
+      error?.details,
     );
   }
 
@@ -71,7 +82,7 @@ export async function saveProjectEvidence(
   files: File[],
 ) {
   for (const file of files.slice(0, 8)) {
-    const safeName = file.name.replace(/[^aA-Zz0-9._-]/g, "-");
+    const safeName = file.name.replace(/[^A-Za-z0-9._-]/g, "-");
     const path = `${userId}/${projectId}/${randomUUID()}-${safeName}`;
     const { error: uploadError } = await supabase.storage
       .from("project-evidence")

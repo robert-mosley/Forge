@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { WorkspaceMessage } from "@/components/app/workspace-message";
 import { EngineeringProfileForm } from "@/components/profile/engineering-profile-form";
 import { requireUser } from "@/lib/auth/require-user";
@@ -21,14 +22,7 @@ export default async function ProfilePage({
     const bundle = await getProfileBundle(supabase, user.id);
 
     if (!isProfileComplete(bundle.profile, bundle.selectedSkills.length)) {
-      return (
-        <WorkspaceMessage
-          title="Finish your profile first."
-          message="Add your academic details and at least one skill before reviewing your profile."
-          actionHref="/profile/setup"
-          actionLabel="Continue setup"
-        />
-      );
+      redirect("/profile/setup");
     }
 
     const params = await searchParams;
@@ -36,7 +30,7 @@ export default async function ProfilePage({
     const { data: projects, error: projectError } = await supabase
       .from("projects")
       .select(
-        "repo_name, github_url, description, technical_overview, tech_stack, processing_status, created_at"
+        "id, title, repo_name, github_url, description, technical_overview, discipline, project_type, student_role, contributions, outcomes, tech_stack, processing_status, created_at"
       )
       .eq("user_id", user.id)
       .order("created_at", { ascending: false });
@@ -75,16 +69,26 @@ export default async function ProfilePage({
       .filter((name): name is string => Boolean(name));
 
     const portfolioProjects = projects ?? [];
+    const profileInterests = bundle.profile?.interests ?? [];
 
     return (
       <article className="portfolio-page">
         <header className="portfolio-header">
           <div>
             <p className="workspace-eyebrow">Student portfolio / KSU</p>
+            {bundle.profile?.profile_picture_url && (
+              // eslint-disable-next-next-line @next/next/no-img-element
+              <img
+                className="student-profile-picture"
+                src={bundle.profile.profile_picture_url}
+                alt=""
+              />
+            )}
             <h1>{bundle.profile?.full_name || bundle.profile?.username}</h1>
             {bundle.profile?.major && (
               <p className="portfolio-headline">
                 {bundle.profile.major}
+                {bundle.profile.academic_year ? ` · ${bundle.profile.academic_year}` : ""}
                 {bundle.profile.campus ? ` · ${bundle.profile.campus}` : ""}
               </p>
             )}
@@ -93,10 +97,10 @@ export default async function ProfilePage({
             )}
           </div>
           <div className="portfolio-actions">
-            {bundle.profile?.github_username && (
+            {(bundle.profile?.github_url || bundle.profile?.github_username) && (
               <a
                 className="workspace-button"
-                href={`https://github.com/${bundle.profile.github_username}`}
+                href={bundle.profile.github_url || `https://github.com/${bundle.profile.github_username}`}
                 rel="noreferrer"
                 target="_blank"
               >
@@ -108,6 +112,18 @@ export default async function ProfilePage({
             </Link>
           </div>
         </header>
+
+        {profileInterests.length > 0 && (
+          <section className="portfolio-section">
+            <p className="workspace-eyebrow">Interests</p>
+            <h2>Areas I am exploring</h2>
+            <ul className="portfolio-skill-list">
+              {profileInterests.map((interest) => (
+                <li key={interest}>{interest}</li>
+              ))}
+            </ul>
+          </section>
+        )}
 
         {skillNames.length > 0 && (
           <section
@@ -132,17 +148,17 @@ export default async function ProfilePage({
           <h2 id="portfolio-projects-title">Projects</h2>
           {portfolioProjects.length === 0 ? (
             <p className="portfolio-empty">
-              Add your GitHub username and generate your portfolio to showcase
-              projects.
+              Share your engineering projects here. GitHub is optional; you can add
+              work manually.
             </p>
           ) : (
             <div className="portfolio-project-grid">
               {portfolioProjects.map((project) => (
-                <article className="portfolio-project" key={project.repo_name}>
+                <Link className="portfolio-project" href={`/projects/${project.id}`} key={project.id}>
                   <p className="portfolio-project-status">
-                    {project.processing_status}
+                    {project.discipline || project.project_type || project.processing_status}
                   </p>
-                  <h3>{project.repo_name}</h3>
+                  <h3>{project.title || project.repo_name}</h3>
                   {project.description && <p>{project.description}</p>}
                   {project.technical_overview && <p>{project.technical_overview}</p>}
                   {project.tech_stack.length > 0 && (
@@ -161,7 +177,7 @@ export default async function ProfilePage({
                       View repository ↗
                     </a>
                   )}
-                </article>
+                </Link>
               ))}
             </div>
           )}
@@ -169,15 +185,7 @@ export default async function ProfilePage({
       </article>
     );
   } catch (error) {
-    return (
-      <WorkspaceMessage
-        title="Your profile could not be loaded."
-        message={
-          error instanceof ProfileServiceError
-            ? error.message
-            : "Try again after checking the Supabase setup."
-        }
-      />
-    );
+    void error;
+    redirect("/profile/setup");
   }
 }

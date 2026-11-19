@@ -13,7 +13,7 @@ export default async function ProjectDetailPage({
 
   const { data: project, error } = await supabase
     .from("projects")
-    .select("id, user_id, title, repo_name, description, technical_overview, discipline, project_type, student_role, contributions, outcomes, tech_stack, github_url, is_public, created_at")
+    .select("id, user_id, title, repo_name, description, technical_overview, discipline, project_type, student_role, contributions, outcomes, tech_stack, github_url, is_public, seeking_collaborators, collaboration_roles, post_summary, created_at")
     .eq("id", id)
     .eq("is_public", true)
     .maybeSingle();
@@ -36,6 +36,8 @@ export default async function ProjectDetailPage({
       .order("created_at", { ascending: false }),
   ]);
 
+  const evidenceItems = evidence ?? [];
+
   return (
     <article className="project-detail">
       <header>
@@ -47,6 +49,26 @@ export default async function ProjectDetailPage({
           </Link>
         )}
       </header>
+
+      {project.post_summary && (
+        <section>
+          <p className="workspace-eyebrow">Team post</p>
+          <p className="project-detail-copy">{project.post_summary}</p>
+        </section>
+      )}
+
+      {project.seeking_collaborators && (
+        <section>
+          <p className="workspace-eyebrow">Looking for teammates</p>
+          {project.collaboration_roles?.length > 0 ? (
+            <ul className="tag-list">
+              {project.collaboration_roles.map((role) => <li key={role}>{role}</li>)}
+            </ul>
+          ) : (
+            <p className="project-detail-copy">Open to interested KSU collaborators.</p>
+          )}
+        </section>
+      )}
 
       {(project.description || project.technical_overview) && (
         <section>
@@ -85,11 +107,11 @@ export default async function ProjectDetailPage({
         </section>
       )}
 
-      {evidence?.length > 0 && (
+      {evidenceItems.length > 0 && (
         <section>
           <p className="workspace-eyebrow">Evidence</p>
           <div className="evidence-grid">
-            {evidence.map((item) => (
+            {evidenceItems.map((item) => (
               <a href={item.file_url} target="_blank" rel="noreferrer" key={item.id}>
                 <span>{item.kind}</span>
                 <strong>{item.title || item.file_name}</strong>

@@ -22,6 +22,7 @@ export type ProfileRow = {
   interests: string[];
   is_discoverable: boolean;
   show_availability: boolean;
+  embedding: number[] | null;
   created_at: string;
 };
 
@@ -44,7 +45,23 @@ export type Database = {
     Tables: {
       profiles: Table<
         ProfileRow,
-        Omit<ProfileRow, "created_at"> & { created_at?: string }
+        {
+          id: string;
+          username?: string | null;
+          full_name?: string | null;
+          major?: string | null;
+          campus?: string | null;
+          bio?: string | null;
+          github_username?: string | null;
+          github_url?: string | null;
+          profile_picture_url?: string | null;
+          academic_year?: string | null;
+          interests?: string[];
+          is_discoverable?: boolean;
+          show_availability?: boolean;
+          embedding?: number[] | null;
+          created_at?: string;
+        }
       >;
       projects: Table<
         {
@@ -63,6 +80,10 @@ export type Database = {
           tech_stack: string[];
           processing_status: "pending" | "processing" | "ready" | "failed";
           is_public: boolean;
+          seeking_collaborators: boolean;
+          collaboration_roles: string[];
+          post_summary: string | null;
+          embedding: number[] | null;
           created_at: string;
         },
         {
@@ -81,6 +102,10 @@ export type Database = {
           tech_stack?: string[];
           processing_status?: "pending" | "processing" | "ready" | "failed";
           is_public?: boolean;
+          seeking_collaborators?: boolean;
+          collaboration_roles?: string[];
+          post_summary?: string | null;
+          embedding?: number[] | null;
           created_at?: string;
         }
       >;
@@ -105,6 +130,20 @@ export type Database = {
           file_url: string;
           storage_path?: string | null;
           kind?: string;
+          created_at?: string;
+        }
+      >;
+      project_feed_actions: Table<
+        {
+          project_id: string;
+          user_id: string;
+          action: "like" | "save" | "interest";
+          created_at: string;
+        },
+        {
+          project_id: string;
+          user_id: string;
+          action: "like" | "save" | "interest";
           created_at?: string;
         }
       >;
