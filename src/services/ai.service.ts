@@ -1,4 +1,5 @@
 import type { GitHubPortfolio } from "@/services/github.service";
+import { getBackendUrl } from "@/lib/backend-url";
 
 export class PortfolioBackendError extends Error {
   constructor(message: string) {
@@ -10,8 +11,12 @@ export class PortfolioBackendError extends Error {
 export async function generateClaudePortfolio(
   githubUsername: string,
 ): Promise<GitHubPortfolio> {
-  const backendUrl = process.env.FASTAPI_BACKEND_URL?.replace(/\/$/, "") ??
-    "http://127.0.0.1:8000";
+  let backendUrl: string;
+  try {
+    backendUrl = getBackendUrl();
+  } catch {
+    throw new PortfolioBackendError("FASTAPI_BACKEND_URL is not configured.");
+  }
 
   let response: Response;
   try {
@@ -23,7 +28,7 @@ export async function generateClaudePortfolio(
     });
   } catch {
     throw new PortfolioBackendError(
-      "The portfolio backend is not reachable. Start FastAPI on port 8000.",
+      "The portfolio backend is not reachable.",
     );
   }
 

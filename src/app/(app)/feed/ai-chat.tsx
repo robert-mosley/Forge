@@ -45,7 +45,7 @@ export default function KSUForgeAIChat() {
     setLoading(true);
 
     try {
-      const response = await fetch("/api/forge-ai/chat", {
+      const response = await fetch("/api/ksuforge-ai/chat", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

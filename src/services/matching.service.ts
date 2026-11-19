@@ -1,5 +1,6 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "@/types/database";
+import { getBackendUrl } from "@/lib/backend-url";
 
 export type KSUForgeSupabaseClient = SupabaseClient<Database>;
 
@@ -190,7 +191,7 @@ export async function getProjectFeedMatches(
   }
 
   try {
-    const backendUrl = (process.env.FASTAPI_BACKEND_URL ?? "http://127.0.0.1:8000").replace(/\/$/, "");
+    const backendUrl = getBackendUrl();
     const response = await fetch(`${backendUrl}/feed/rank`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },

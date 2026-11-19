@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { getBackendUrl } from "@/lib/backend-url";
 
 export async function POST(request: NextRequest) {
   const body = await request.json().catch(() => null) as { github_username?: string } | null;
@@ -11,7 +12,15 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const backendUrl = (process.env.FASTAPI_BACKEND_URL ?? "http://127.0.0.1:8000").replace(/\/$/, "");
+  let backendUrl: string;
+  try {
+    backendUrl = getBackendUrl();
+  } catch {
+    return NextResponse.json(
+      { detail: "FASTAPI_BACKEND_URL is not configured for this deployment." },
+      { status: 503 },
+    );
+  }
 
   try {
     const response = await fetch(`${backendUrl}/portfolio/generate`, {
@@ -26,7 +35,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(payload, { status: response.status });
   } catch {
     return NextResponse.json(
-      { detail: "The portfolio backend is not running. Start it on port 8000." },
+      { detail: "The portfolio backend is not reachable." },
       { status: 503 },
     );
   }

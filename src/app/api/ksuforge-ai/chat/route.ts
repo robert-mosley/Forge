@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { getBackendUrl } from "@/lib/backend-url";
 
 export async function POST(request: NextRequest) {
   const supabase = await createClient();
@@ -22,7 +23,15 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Enter a question or project idea." }, { status: 400 });
   }
 
-  const backendUrl = (process.env.FASTAPI_BACKEND_URL ?? "http://127.0.0.1:8000").replace(/\/$/, "");
+  let backendUrl: string;
+  try {
+    backendUrl = getBackendUrl();
+  } catch {
+    return NextResponse.json(
+      { error: "FASTAPI_BACKEND_URL is not configured for this deployment." },
+      { status: 503 },
+    );
+  }
 
   try {
     const response = await fetch(`${backendUrl}/ai/chat`, {
@@ -51,7 +60,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(payload);
   } catch {
     return NextResponse.json(
-      { error: "The AI backend is not reachable. Start FastAPI on port 8000." },
+      { error: "The AI backend is not reachable." },
       { status: 503 },
     );
   }

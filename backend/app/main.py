@@ -16,10 +16,10 @@ load_dotenv(".env")
 
 app = FastAPI(title="KSUForge Portfolio API", version="1.0.0")
 
-app_origin = os.getenv("NEXT_PUBLIC_APP_ORIGIN", "http://localhost:5000")
+app_origin = os.getenv("NEXT_PUBLIC_APP_ORIGIN", "https://forge-robert-6677.vercel.app/")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[app_origin, "http://127.0.0.1:5000", "http://0.0.0.0:5000"],
+    allow_origins=[app_origin.rstrip("/")],
     allow_credentials=True,
     allow_methods=["GET", "POST", "OPTIONS"],
     allow_headers=["*"],
