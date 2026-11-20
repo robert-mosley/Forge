@@ -16,7 +16,9 @@ load_dotenv(".env")
 
 app = FastAPI(title="KSUForge Portfolio API", version="1.0.0")
 
-app_origin = os.getenv("NEXT_PUBLIC_APP_ORIGIN", "https://forge-robert-6677.vercel.app/")
+app_origin = (os.getenv("NEXT_PUBLIC_APP_ORIGIN") or os.getenv("FRONTEND_ORIGIN") or "").strip()
+if not app_origin:
+    raise RuntimeError("NEXT_PUBLIC_APP_ORIGIN (or FRONTEND_ORIGIN) must be configured for CORS.")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[app_origin.rstrip("/")],

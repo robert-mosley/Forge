@@ -72,11 +72,16 @@ export default function KSUForgeAIChat() {
         },
       ]);
     } catch (error) {
+      const message =
+        error instanceof Error && error.message
+          ? error.message
+          : "I couldn't complete that search. Please try again.";
+
       setMessages((prev) => [
         ...prev,
         {
           role: "assistant",
-          content: "I couldn't complete that search. Please try again.",
+          content: message,
         },
       ]);
     } finally {
