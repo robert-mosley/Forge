@@ -87,6 +87,7 @@ export async function importGitHubPortfolio(
       .upsert(
         {
           user_id: userId,
+          title: project.repo_name,
           github_url: project.github_url,
           repo_name: project.repo_name,
           description: project.description,

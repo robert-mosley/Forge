@@ -1,9 +1,17 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { getBackendUrl } from "@/lib/backend-url";
+import { createClient } from "@/lib/supabase/server";
+import { generateClaudePortfolio } from "@/services/ai.service";
+import { importGitHubPortfolio, PortfolioImportError } from "@/services/portfolio.service";
 
 export async function POST(request: NextRequest) {
-  const body = await request.json().catch(() => null) as { github_username?: string } | null;
+  const body = await request.json().catch(() => null) as {
+    github_username?: string;
+    return_to?: string;
+  } | null;
   const githubUsername = body?.github_username?.trim().replace(/^@/, "") ?? "";
+  const returnTo = body?.return_to === "/profile?edit=1"
+    ? "/profile?edit=1&imported=1"
+    : "/profile/setup?imported=1";
 
   if (!githubUsername) {
     return NextResponse.json(
@@ -12,31 +20,33 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  let backendUrl: string;
-  try {
-    backendUrl = getBackendUrl();
-  } catch {
+  const supabase = await createClient();
+  const {
+    data: { user },
+    error: userError,
+  } = await supabase.auth.getUser();
+
+  if (userError || !user) {
     return NextResponse.json(
-      { detail: "FASTAPI_BACKEND_URL is not configured for this deployment." },
-      { status: 503 },
+      { detail: "You must be signed in to import your portfolio." },
+      { status: 401 },
     );
   }
 
   try {
-    const response = await fetch(`${backendUrl}/portfolio/generate`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ github_username: githubUsername }),
-      cache: "no-store",
-    });
+    const portfolio = await generateClaudePortfolio(githubUsername);
+    await importGitHubPortfolio(supabase, user.id, portfolio);
 
-    const payload = await response.json().catch(() => ({ detail: "The backend returned an invalid response." }));
+    return NextResponse.json({ redirect_to: returnTo, portfolio }, { status: 200 });
+  } catch (error) {
+    const detail =
+      error instanceof PortfolioImportError || error instanceof Error
+        ? error.message
+        : "The portfolio could not be generated.";
 
-    return NextResponse.json(payload, { status: response.status });
-  } catch {
     return NextResponse.json(
-      { detail: "The portfolio backend is not reachable." },
-      { status: 503 },
+      { detail },
+      { status: 500 },
     );
   }
 }

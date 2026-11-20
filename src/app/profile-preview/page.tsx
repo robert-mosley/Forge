@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 
 type PortfolioProject = {
@@ -23,6 +24,7 @@ type Portfolio = {
 };
 
 export default function ProfilePreviewPage() {
+  const router = useRouter();
   const [username, setUsername] = useState("");
   const [portfolio, setPortfolio] = useState<Portfolio | null>(null);
   const [error, setError] = useState("");
@@ -44,6 +46,11 @@ export default function ProfilePreviewPage() {
 
       if (!response.ok) {
         setError(payload.detail ?? "The portfolio could not be generated.");
+        return;
+      }
+
+      if (payload.redirect_to) {
+        router.push(payload.redirect_to as string);
         return;
       }
 
@@ -79,7 +86,7 @@ export default function ProfilePreviewPage() {
               required
             />
             <button disabled={pending} type="submit">
-              {pending ? "Generating…" : "Generate preview"}
+              {pending ? "Generating…" : "Generate my portfolio"}
             </button>
           </div>
         </form>

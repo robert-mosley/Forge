@@ -48,19 +48,24 @@ export function EngineeringProfileForm({
   const selectedById = new Map(selectedSkills.map((skill) => [skill.skill_id, skill.proficiency]));
 
   const [skillQuery, setSkillQuery] = useState("");
-  const [selectedSkillState, setSelectedSkillState] = useState(() =>
-    selectedSkills
-      .map((selected) => {
-        const skill = skills.find((item) => item.id === selected.skill_id);
-        if (!skill) return null;
-        return {
-          id: skill.id,
-          name: skill.canonical_name,
-          proficiency: selected.proficiency,
-        };
-      })
-      .filter((value): value is { id: string; name: string; proficiency: Proficiency } => Boolean(value)),
-  );
+  const [selectedSkillState, setSelectedSkillState] = useState(() => {
+    const uniqueSkills = new Map<string, { id: string; name: string; proficiency: Proficiency }>();
+
+    for (const selected of selectedSkills) {
+      if (uniqueSkills.has(selected.skill_id)) continue;
+
+      const skill = skills.find((item) => item.id === selected.skill_id);
+      if (!skill) continue;
+
+      uniqueSkills.set(selected.skill_id, {
+        id: skill.id,
+        name: skill.canonical_name,
+        proficiency: selected.proficiency,
+      });
+    }
+
+    return [...uniqueSkills.values()];
+  });
 
   const selectedIds = useMemo(
     () => new Set(selectedSkillState.map((skill) => skill.id)),
