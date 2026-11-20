@@ -35,7 +35,7 @@ export function GitHubPortfolioImport({
         </p>
       </div>
 
-      <form action={formAction} className="github-import-form">
+      <div className="github-import-form">
         <label className="form-field" htmlFor="github-import-username">
           <span>GitHub username</span>
           <input
@@ -55,10 +55,10 @@ export function GitHubPortfolioImport({
             {state.message}
           </p>
         )}
-        <Button disabled={pending} type="submit">
+        <Button disabled={pending} formAction={formAction} formNoValidate type="submit">
           {pending ? "Generating portfolio…" : "Generate my portfolio"}
         </Button>
-      </form>
+      </div>
     </section>
   );
 }
