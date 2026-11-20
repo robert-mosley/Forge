@@ -105,20 +105,30 @@ export async function importGitHubPortfolio(
       );
     }
 
-    const evidenceRows = project.skills
-      .map((skillName) => {
-        const skillId = skillIdByName.get(skillName);
-        if (!skillId) return null;
-        return {
-          project_id: savedProject.id,
-          skill_id: skillId,
-          confidence: 0.75,
-          evidence_type: "readme" as const,
-          evidence_text: project.description || project.technical_overview,
-          evidence_url: project.github_url,
-        };
-      })
-      .filter((row): row is NonNullable<typeof row> => row !== null);
+    const evidenceBySkillId = new Map<string, {
+      project_id: string;
+      skill_id: string;
+      confidence: number;
+      evidence_type: "readme";
+      evidence_text: string;
+      evidence_url: string;
+    }>();
+
+    for (const skillName of project.skills) {
+      const skillId = skillIdByName.get(skillName);
+      if (!skillId || evidenceBySkillId.has(skillId)) continue;
+
+      evidenceBySkillId.set(skillId, {
+        project_id: savedProject.id,
+        skill_id: skillId,
+        confidence: 0.75,
+        evidence_type: "readme",
+        evidence_text: project.description || project.technical_overview || project.repo_name,
+        evidence_url: project.github_url,
+      });
+    }
+
+    const evidenceRows = [...evidenceBySkillId.values()];
 
     if (evidenceRows.length > 0) {
       const { error: evidenceError } = await supabase
