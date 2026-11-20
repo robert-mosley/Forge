@@ -73,6 +73,22 @@ function firstValidationMessage(error: { issues: { message: string }[] }) {
   return error.issues[0]?.message ?? "Check the information and try again.";
 }
 
+function rateLimitAuthError(message: string): string {
+  const waitMatch = message.match(/(\d+)\s*(second|seconds|minute|minutes)/i);
+  const waitHint = waitMatch
+    ? ` Wait about ${waitMatch[1]} ${waitMatch[2].toLowerCase()} before trying again.`
+    : " Wait 5-10 minutes before trying again.";
+
+  const base =
+    "Too many auth attempts right now. This is usually a Supabase Auth rate limit on free tier.";
+
+  if (process.env.NODE_ENV !== "production") {
+    return `${base}${waitHint} Supabase said: ${message}`;
+  }
+
+  return `${base}${waitHint}`;
+}
+
 function genericAuthError(message: string): string {
   if (/invalid login credentials/i.test(message)) {
     return "That email and password combination was not recognized.";
@@ -83,7 +99,7 @@ function genericAuthError(message: string): string {
   }
 
   if (/rate limit/i.test(message)) {
-    return "Too many attempts. Wait a moment and try again.";
+    return rateLimitAuthError(message);
   }
 
   return "We could not complete that request. Please try again.";

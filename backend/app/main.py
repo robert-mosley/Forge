@@ -150,7 +150,9 @@ query PortfolioSource($login: String!) {
 
         payload = response.json()
         if payload.get("errors"):
-                raise HTTPException(status_code=502, detail="GitHub GraphQL request failed.")
+            first_error = (payload.get("errors") or [{}])[0]
+            message = str(first_error.get("message") or "GitHub GraphQL request failed.")
+            raise HTTPException(status_code=502, detail=f"GitHub GraphQL request failed: {message}")
 
         user = (payload.get("data") or {}).get("user")
         if not user:
@@ -570,7 +572,36 @@ async def generate_portfolio(request: PortfolioRequest) -> Portfolio:
     github_token = os.getenv("GITHUB_TOKEN")
     async with httpx.AsyncClient(base_url="https://api.github.com", timeout=20.0) as client:
         if github_token:
-            profile, repository_data = await github_get_graphql_portfolio(client, username, github_token)
+            try:
+                profile, repository_data = await github_get_graphql_portfolio(client, username, github_token)
+            except HTTPException as error:
+                # Fall back to REST flow if GraphQL is unavailable or schema-restricted.
+                if error.status_code == 404:
+                    raise
+
+                profile = await github_get(client, f"/users/{username}")
+                repos = await github_get(
+                    client,
+                    f"/users/{profile['login']}/repos?sort=updated&per_page=12&type=owner",
+                )
+
+                repository_data = []
+                for repo in repos:
+                    if repo.get("fork") or repo.get("archived"):
+                        continue
+
+                    languages = [repo.get("language")] if repo.get("language") else []
+                    repository_data.append(
+                        {
+                            "name": repo.get("name"),
+                            "url": repo.get("html_url"),
+                            "description": repo.get("description"),
+                            "languages": languages,
+                            "readme": "",
+                        }
+                    )
+                    if len(repository_data) >= 6:
+                        break
         else:
             profile = await github_get(client, f"/users/{username}")
             repos = await github_get(
