@@ -19,6 +19,29 @@ function generatedUsername(githubUsername: string, userId: string): string {
   return `${base}_${suffix}`.slice(0, 24);
 }
 
+function normalizedUsername(
+  existingUsername: string | null | undefined,
+  githubUsername: string,
+  userId: string,
+): string {
+  const candidate = (existingUsername ?? "")
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9_]+/g, "_")
+    .replace(/^_+|_+$/g, "")
+    .slice(0, 24);
+
+  if (/^[a-z0-9_]{3,24}$/.test(candidate)) {
+    return candidate;
+  }
+
+  return generatedUsername(githubUsername, userId);
+}
+
+function normalizedBio(value: string): string {
+  return value.trim().slice(0, 280);
+}
+
 export async function importGitHubPortfolio(
   supabase: KSUForgeSupabaseClient,
   userId: string,
@@ -34,10 +57,11 @@ export async function importGitHubPortfolio(
     throw new PortfolioImportError("Your profile could not be loaded for import.");
   }
 
-  const baseUsername = existing?.username?.trim() || generatedUsername(portfolio.username, userId);
+  const baseUsername = normalizedUsername(existing?.username, portfolio.username, userId);
   const fullName = existing?.full_name?.trim() || portfolio.display_name?.trim() || portfolio.username;
-  const bio = existing?.bio?.trim() || portfolio.profile_summary?.trim() || portfolio.bio?.trim() ||
+  const bioSource = existing?.bio?.trim() || portfolio.profile_summary?.trim() || portfolio.bio?.trim() ||
     `Builder working across ${portfolio.skills.slice(0, 4).join(", ") || "software projects"}.`;
+  const bio = normalizedBio(bioSource);
 
   const { error: profileError } = await supabase.from("profiles").upsert(
     {
