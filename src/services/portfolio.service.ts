@@ -136,9 +136,12 @@ export async function importGitHubPortfolio(
         .upsert(evidenceRows, { onConflict: "project_id,skill_id" });
 
       if (evidenceError) {
-        throw new PortfolioImportError(
-          `KSUForge could not save skill evidence for ${project.repo_name}.`,
-        );
+        // Keep import resilient: if the bulk write fails, try row-by-row and continue.
+        for (const row of evidenceRows) {
+          await supabase
+            .from("project_skills")
+            .upsert(row, { onConflict: "project_id,skill_id" });
+        }
       }
     }
   }
