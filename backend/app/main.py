@@ -1,5 +1,4 @@
 import os
-import base64
 import json
 import re
 from typing import Any
@@ -87,6 +86,106 @@ async def github_get(client: httpx.AsyncClient, path: str) -> Any:
     if response.status_code >= 400:
         raise HTTPException(status_code=502, detail=f"GitHub request failed ({response.status_code}).")
     return response.json()
+
+
+async def github_get_graphql_portfolio(
+        client: httpx.AsyncClient,
+        username: str,
+        token: str,
+) -> tuple[dict[str, Any], list[dict[str, Any]]]:
+        query = """
+query PortfolioSource($login: String!) {
+    user(login: $login) {
+        login
+        name
+        bio
+        repositories(
+            first: 12
+            ownerAffiliations: OWNER
+            orderBy: { field: UPDATED_AT, direction: DESC }
+            isFork: false
+        ) {
+            nodes {
+                name
+                url
+                description
+                isArchived
+                language {
+                    name
+                }
+                languages(first: 8, orderBy: { field: SIZE, direction: DESC }) {
+                    nodes {
+                        name
+                    }
+                }
+                object(expression: "HEAD:README.md") {
+                    ... on Blob {
+                        text
+                    }
+                }
+            }
+        }
+    }
+}
+"""
+
+        response = await client.post(
+                "/graphql",
+                headers={
+                        "Authorization": f"Bearer {token}",
+                        "Accept": "application/vnd.github+json",
+                        "X-GitHub-Api-Version": "2022-11-28",
+                        "User-Agent": "forge-portfolio-builder",
+                },
+                json={"query": query, "variables": {"login": username}},
+        )
+
+        if response.status_code in (401, 403):
+                raise HTTPException(
+                        status_code=429,
+                        detail="GitHub rate limiting prevented the portfolio import. Try again later.",
+                )
+        if response.status_code >= 400:
+                raise HTTPException(status_code=502, detail=f"GitHub request failed ({response.status_code}).")
+
+        payload = response.json()
+        if payload.get("errors"):
+                raise HTTPException(status_code=502, detail="GitHub GraphQL request failed.")
+
+        user = (payload.get("data") or {}).get("user")
+        if not user:
+                raise HTTPException(status_code=404, detail="That GitHub username could not be found.")
+
+        profile = {
+                "login": user.get("login") or username,
+                "name": user.get("name"),
+                "bio": user.get("bio"),
+        }
+
+        repository_data: list[dict[str, Any]] = []
+        for repo in ((user.get("repositories") or {}).get("nodes") or []):
+                if repo.get("isArchived"):
+                        continue
+
+                language_nodes = ((repo.get("languages") or {}).get("nodes") or [])
+                languages = [item.get("name") for item in language_nodes if item and item.get("name")]
+                if not languages and (repo.get("language") or {}).get("name"):
+                        languages = [repo["language"]["name"]]
+
+                readme_text = (((repo.get("object") or {}).get("text")) or "")
+                repository_data.append(
+                        {
+                                "name": repo.get("name"),
+                                "url": repo.get("url"),
+                                "description": repo.get("description"),
+                                "languages": languages,
+                                "readme": clean_markdown(readme_text) if readme_text else "",
+                        }
+                )
+                if len(repository_data) >= 6:
+                        break
+
+        return profile, repository_data
 
 def clean_markdown(markdown: str) -> str:
     markdown = re.sub(r"```.*?```", " ", markdown, flags=re.DOTALL)
@@ -468,45 +567,34 @@ async def generate_portfolio(request: PortfolioRequest) -> Portfolio:
             detail="Claude is not configured. Set ANTHROPIC_API_KEY in backend/.env.",
         )
 
+    github_token = os.getenv("GITHUB_TOKEN")
     async with httpx.AsyncClient(base_url="https://api.github.com", timeout=20.0) as client:
-        profile = await github_get(client, f"/users/{username}")
-        repos = await github_get(
-            client,
-            f"/users/{profile['login']}/repos?sort=updated&per_page=12&type=owner",
-        )
-
-        repository_data: list[dict[str, Any]] = []
-        for repo in repos:
-            if repo.get("fork") or repo.get("archived"):
-                continue
-
-            name = repo["name"]
-            languages = await github_get(client, f"/repos/{profile['login']}/{name}/languages")
-            readme = ""
-            readme_response = await client.get(
-                f"/repos/{profile['login']}/{name}/readme",
-                headers=github_headers(),
+        if github_token:
+            profile, repository_data = await github_get_graphql_portfolio(client, username, github_token)
+        else:
+            profile = await github_get(client, f"/users/{username}")
+            repos = await github_get(
+                client,
+                f"/users/{profile['login']}/repos?sort=updated&per_page=12&type=owner",
             )
-            if readme_response.status_code == 200:
-                readme_payload = readme_response.json()
-                encoded = readme_payload.get("content")
-                if encoded:
-                    try:
-                        readme = clean_markdown(base64.b64decode(encoded).decode("utf-8", errors="replace"))
-                    except Exception:
-                        readme = ""
 
-            repository_data.append(
-                {
-                    "name": name,
-                    "url": repo["html_url"],
-                    "description": repo.get("description"),
-                    "languages": list(languages.keys()),
-                    "readme": readme,
-                }
-            )
-            if len(repository_data) >= 6:
-                break
+            repository_data = []
+            for repo in repos:
+                if repo.get("fork") or repo.get("archived"):
+                    continue
+
+                languages = [repo.get("language")] if repo.get("language") else []
+                repository_data.append(
+                    {
+                        "name": repo.get("name"),
+                        "url": repo.get("html_url"),
+                        "description": repo.get("description"),
+                        "languages": languages,
+                        "readme": "",
+                    }
+                )
+                if len(repository_data) >= 6:
+                    break
 
     prompt = f"""You create a polished, accurate software portfolio for a KSU computing student.
 
