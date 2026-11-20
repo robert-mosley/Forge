@@ -23,7 +23,36 @@ function field(formData: FormData, name: string): string {
 }
 
 async function getRequestOrigin(): Promise<string | null> {
+  const configuredOrigin = process.env.NEXT_PUBLIC_APP_ORIGIN?.trim();
+  if (configuredOrigin) {
+    try {
+      const parsed = new URL(configuredOrigin);
+      if (parsed.protocol === "https:" || parsed.protocol === "http:") {
+        return parsed.origin;
+      }
+    } catch {
+      // Fall back to request headers below.
+    }
+  }
+
   const requestHeaders = await headers();
+  const forwardedHost = requestHeaders.get("x-forwarded-host");
+  const forwardedProto = requestHeaders.get("x-forwarded-proto");
+
+  if (forwardedHost) {
+    const protocol = forwardedProto === "http" || forwardedProto === "https"
+      ? forwardedProto
+      : "https";
+    try {
+      const parsed = new URL(`${protocol}://${forwardedHost}`);
+      if (parsed.protocol === "https:" || parsed.protocol === "http:") {
+        return parsed.origin;
+      }
+    } catch {
+      // Fall back to origin header below.
+    }
+  }
+
   const origin = requestHeaders.get("origin");
 
   if (!origin) {
