@@ -22,17 +22,42 @@ function field(formData: FormData, name: string): string {
   return typeof value === "string" ? value : "";
 }
 
+function isLoopbackHost(hostname: string): boolean {
+  return hostname === "localhost" || hostname === "127.0.0.1" || hostname === "::1";
+}
+
+function normalizeHttpOrigin(value: string): string | null {
+  try {
+    const parsed = new URL(value);
+    if (parsed.protocol !== "https:" && parsed.protocol !== "http:") {
+      return null;
+    }
+
+    if (process.env.NODE_ENV === "production" && isLoopbackHost(parsed.hostname)) {
+      return null;
+    }
+
+    return parsed.origin;
+  } catch {
+    return null;
+  }
+}
+
 async function getRequestOrigin(): Promise<string | null> {
   const configuredOrigin = process.env.NEXT_PUBLIC_APP_ORIGIN?.trim();
-  if (configuredOrigin) {
-    try {
-      const parsed = new URL(configuredOrigin);
-      if (parsed.protocol === "https:" || parsed.protocol === "http:") {
-        return parsed.origin;
-      }
-    } catch {
-      // Fall back to request headers below.
-    }
+  const normalizedConfiguredOrigin = configuredOrigin
+    ? normalizeHttpOrigin(configuredOrigin)
+    : null;
+  if (normalizedConfiguredOrigin) {
+    return normalizedConfiguredOrigin;
+  }
+
+  const vercelUrl = process.env.VERCEL_URL?.trim();
+  const normalizedVercelOrigin = vercelUrl
+    ? normalizeHttpOrigin(`https://${vercelUrl.replace(/^https?:\/\//, "")}`)
+    : null;
+  if (normalizedVercelOrigin) {
+    return normalizedVercelOrigin;
   }
 
   const requestHeaders = await headers();
@@ -43,13 +68,9 @@ async function getRequestOrigin(): Promise<string | null> {
     const protocol = forwardedProto === "http" || forwardedProto === "https"
       ? forwardedProto
       : "https";
-    try {
-      const parsed = new URL(`${protocol}://${forwardedHost}`);
-      if (parsed.protocol === "https:" || parsed.protocol === "http:") {
-        return parsed.origin;
-      }
-    } catch {
-      // Fall back to origin header below.
+    const normalizedForwardedOrigin = normalizeHttpOrigin(`${protocol}://${forwardedHost}`);
+    if (normalizedForwardedOrigin) {
+      return normalizedForwardedOrigin;
     }
   }
 
@@ -59,14 +80,7 @@ async function getRequestOrigin(): Promise<string | null> {
     return null;
   }
 
-  try {
-    const parsed = new URL(origin);
-    return parsed.protocol === "https:" || parsed.protocol === "http:"
-      ? parsed.origin
-      : null;
-  } catch {
-    return null;
-  }
+  return normalizeHttpOrigin(origin);
 }
 
 function firstValidationMessage(error: { issues: { message: string }[] }) {

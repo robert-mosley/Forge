@@ -21,8 +21,11 @@ KSUForge includes `/login`, `/signup`, `/forgot-password`, and
 
 Copy `.env.example` to `.env.local`, set `NEXT_PUBLIC_SUPABASE_URL` and
 `NEXT_PUBLIC_SUPABASE_ANON_KEY` from your Supabase project's API settings, and
-apply the SQL migrations from `supabase/migrations`. Restart `npm run dev` after
-changing environment variables.
+set `NEXT_PUBLIC_APP_ORIGIN` to your canonical frontend URL (for example your
+Vercel domain in production). KSUForge uses this value to generate confirmation
+and reset links so they do not resolve to localhost. Apply the SQL migrations
+from `supabase/migrations`. Restart `npm run dev` after changing environment
+variables.
 
 For local email confirmation, add `http://localhost:5000/auth/callback` as a
 Supabase redirect URL. After confirmation, KSUForge sends users to `/profile/setup`.
